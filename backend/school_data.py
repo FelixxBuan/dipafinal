@@ -2503,6 +2503,7 @@ programs = [
     "school_website": "https://www.dhvsu.edu.ph",
     "location": "Bacolor, Pampanga",
     "school_type": "Public"
+
   },   
   {
     "school": "Pampanga State University",

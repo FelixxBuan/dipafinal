@@ -1,25 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from recommendation import recommend
-from typing import List, Optional  
-
+from typing import List, Optional
 from fastapi.responses import JSONResponse
-
+from recommendation import recommend
 import json
 import os
+
 app = FastAPI()
-# Serve school logos
 
-# Serve the program data from JSON
-@app.get("/programs/all")
-def get_all_programs():
-    file_path = os.path.join("data", "all_programs.json")
-    with open(file_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return JSONResponse(content=data)
-
-
+# 🌍 CORS setup
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,24 +18,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 📁 Load all programs (for testing or front-end fallback)
+@app.get("/programs/all")
+def get_all_programs():
+    file_path = os.path.join("data", "all_programs.json")
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return JSONResponse(content=data)
+
+# 📨 Model for request body
 class SearchRequest(BaseModel):
-    interest: str
+    answers: dict
     school_type: str = "any"
-    locations: Optional[List[str]] = None  
+    locations: Optional[List[str]] = None
     max_budget: Optional[float] = None
 
+# 🔍 Main search endpoint
 @app.post("/search")
 def search(data: SearchRequest):
-    print(f"🟢 Interest: {data.interest} | Type: {data.school_type} | Locations: {data.locations} | Max Budget: {data.max_budget}")
-    
+    print("📥 Received search request")
+
     result = recommend(
-        interest_input=data.interest,
+        answers=data.answers,  # ✅ pass full answers dict now
         school_type=data.school_type,
         locations=data.locations,
         max_budget=data.max_budget,
     )
 
     return result
+
+
 
 @app.get("/programs/showcase")
 def get_program_showcase():

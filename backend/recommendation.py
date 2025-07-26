@@ -10,46 +10,68 @@ with open("data/program_vectors.json", "r", encoding="utf-8") as f:
 
 THRESHOLD = 0.3
 
-def recommend(interest_input: str, school_type: str = None, locations: list[str] = None, max_budget: float = None):
-    interest_input = interest_input.lower().strip()
+def recommend(answers: dict, school_type: str = None, locations: list[str] = None, max_budget: float = None):
+    print("\n📊 Starting Program Matching Breakdown")
 
-    if not interest_input:
+    # Step 1: Per-question vectorization
+    vectors = {}
+    print("\n📥 Question-wise Input Vectorization:")
+    for key in ["subjects", "fields", "activities", "skills", "tools", "workStyle", "impact"]:
+        items = answers.get(key, [])
+        custom = answers.get("custom", {}).get(key, "")
+        merged = items + ([custom] if custom.strip() else [])
+        text = " ".join(merged)
+        if text.strip():
+            vec = model.encode(text)
+        else:
+            vec = np.zeros(768)  # assuming model uses 768 dimensions
+        vectors[key] = vec
+        print(f"🔹 {key} → {text}")
+        print(f"   🔸 Vector: {vec[:5]}...")  # show first 5 dims only
+
+    # Step 2: Combine vectors into one
+    valid_vectors = [v for v in vectors.values() if np.linalg.norm(v) > 0]
+    if not valid_vectors:
         return {
             "type": "fallback",
-            "message": "We couldn't find a strong match for your interest, so here are a few programs you might explore.",
+            "message": "No valid input provided. Please answer at least one question.",
             "results": [],
             "weak_matches": []
         }
 
-    interests = [x.strip() for x in interest_input.replace(" and ", ",").split(",") if x.strip()]
-    vectors = model.encode(interests)
-    combined_vector = np.mean(vectors, axis=0).reshape(1, -1)
+    combined_vector = np.mean(valid_vectors, axis=0).reshape(1, -1)
 
+    print("\n🧮 Average (Combined) User Vector:")
+    print(f"   🔸 Dimensions: {combined_vector.shape[1]}")
+    print(f"   🔸 First 5 values: {combined_vector[0][:5]}")
+
+    # Step 3: Match against programs
     strong_matches = []
     weak_matches = []
 
     for entry in program_data:
         entry_type = entry.get("school_type", "").lower()
 
-        # 📌 School type filter
+        # 🎓 School type filter
         if school_type and school_type.lower() != "any":
             if entry_type != school_type.lower():
                 continue
 
-        # 📌 Location filter (multi-select support)
+        # 📍 Location filter
         if locations:
             entry_location = entry.get("location", "").lower()
             if all(loc.lower() not in entry_location for loc in locations):
                 continue
 
-        # 💰 Budget filter (only for private)
+        # 💰 Budget filter
         if school_type and school_type.lower() == "private" and max_budget is not None:
             tuition = entry.get("tuition_per_semester")
             if tuition is not None and isinstance(tuition, (int, float)) and tuition > max_budget:
                 continue
 
-        # 🧠 Cosine similarity
-        score = cosine_similarity([entry["vector"]], combined_vector)[0][0]
+        # 📈 Cosine similarity
+        program_vector = np.array(entry["vector"]).reshape(1, -1)
+        score = cosine_similarity(program_vector, combined_vector)[0][0]
         rounded_score = round(score, 3)
 
         result_item = {
@@ -73,7 +95,7 @@ def recommend(interest_input: str, school_type: str = None, locations: list[str]
         else:
             weak_matches.append(result_item)
 
-        print(f"🧠 {entry['school']} - {entry['name']}: {score:.3f}")
+        print(f"🏫 {entry['school']} - {entry['name']}: {score:.3f}")
 
     strong_matches.sort(key=lambda x: x["score"], reverse=True)
     weak_matches.sort(key=lambda x: x["score"], reverse=True)
