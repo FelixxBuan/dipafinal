@@ -1,36 +1,68 @@
 import { useLocation } from "react-router-dom";
-import { useState } from "react";
-import {
-  MapPin,
-  BookOpen,
-  Star,
-  Building2,
-  Bus,
-  GraduationCap,
-  Globe,
-  Image as ImageIcon
-} from "lucide-react";
-import schoolStrengths from "../data/school_strengths.json";
+import { useState, useEffect } from "react";
 
-function findSchoolData(schoolName) {
-  const normalizedName = schoolName.toLowerCase();
 
-  for (const key in schoolStrengths) {
-    if (normalizedName.includes(key.toLowerCase())) {
-      return schoolStrengths[key];
-    }
-  }
+function normalize(str) {
+  return str.toLowerCase().replace(/\s+/g, " ").trim();
+}
 
-  return null;
+function findSchoolData(schoolName, schoolsArray) {
+  const normalizedName = normalize(schoolName);
+  return (
+    schoolsArray.find(
+      (school) => normalize(school.name) === normalizedName
+    ) || null
+  );
 }
 
 export default function ComparePage() {
   const location = useLocation();
   const selectedSchools = location.state?.selectedSchools || [];
+  const [schoolsData, setSchoolsData] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/school-strengths")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
+      .then((data) => setSchoolsData(data.schools || []))
+      .catch((error) => {
+        console.error("Error fetching school strengths:", error);
+        setSchoolsData([]);
+      });
+  }, []);
+
+  const specs = [
+    { label: "Address", key: "address" },
+    { label: "Known For", key: "what_theyre_known_for" },
+    {
+      label: "Institutional Strengths",
+      key: "institutional_strengths",
+      format: (v) => (v?.length ? v.join(", ") : "No data available"),
+    },
+    {
+      label: "Central Luzon Rank",
+      key: "unirank",
+      format: (v) =>
+        v?.central_luzon_rank
+          ? `#${v.central_luzon_rank} Central Luzon`
+          : v?.country_rank && v?.world_rank
+          ? `#${v.country_rank} PH / #${v.world_rank} Global`
+          : "No ranking available",
+    },
+    { label: "Dorm / Apartment", key: "dorm_apartment" },
+    { label: "Transport Access", key: "transport_access" },
+    {
+      label: "Scholarships Offered",
+      key: "scholarships_offered",
+      format: (v) => (v?.length ? v.join(", ") : "No scholarships listed"),
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4">
-      <h1 className="text-3xl font-bold text-blue-800 mb-10 text-center">
+    <div className="min-h-screen bg-gray-50 py-10 px-4 overflow-x-auto">
+      <h1 className="text-2xl font-semibold text-gray-800 mb-8 text-center">
         🎓 School Comparison
       </h1>
 
@@ -39,147 +71,65 @@ export default function ComparePage() {
           No schools selected. Please return and choose at least two.
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {selectedSchools.map((school, index) => {
-            const data = findSchoolData(school.school);
-            const [photoIndex, setPhotoIndex] = useState(0);
-
-            if (!data) {
-              return (
-                <div
-                  key={index}
-                  className="bg-white dark:bg-white rounded-2xl border p-6 shadow-md space-y-4"
-                >
-                  <h2 className="text-xl font-bold text-blue-800">
-                    {school.school}
-                  </h2>
-                  <p className="text-sm text-gray-700">
-                    <strong>Program:</strong> {school.program}
-                  </p>
-                  <p className="text-sm text-gray-500">No data available for this school.</p>
-                </div>
-              );
-            }
-
-            const {
-              logo,
-              address,
-              what_theyre_known_for,
-              institutional_strengths,
-              unirank,
-              dorm_apartment,
-              transport_access,
-              scholarships_offered,
-              virtual_tour_photos
-            } = data;
-
-            return (
-              <div
-                key={index}
-                className="bg-white dark:bg-white rounded-2xl border p-6 shadow-md space-y-4"
-              >
-                <div className="flex items-center space-x-3">
-                  <img
-                    src={`/logos/${logo}`}
-                    alt={school.school}
-                    className="w-10 h-10 object-contain"
-                  />
-                  <h2 className="text-xl font-bold text-blue-800">{school.school}</h2>
-                </div>
-
-                <div className="space-y-2 text-sm text-gray-800">
-                  <div className="flex items-center gap-2">
-                    <GraduationCap className="text-purple-600 w-4 h-4" />
-                    <span><strong>Program:</strong> {school.program}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <MapPin className="text-red-500 w-4 h-4" />
-                    <span><strong>Address:</strong> {address}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Star className="text-yellow-500 w-4 h-4" />
-                    <span><strong>Known For:</strong> {what_theyre_known_for}</span>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <BookOpen className="text-green-600 w-4 h-4 mt-0.5" />
-                    <span>
-                      <strong>Institutional Strengths:</strong>{" "}
-                      {institutional_strengths.join(", ")}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Globe className="text-blue-600 w-4 h-4" />
-                    <span>
-                      <strong>Unirank:</strong> #{unirank.country_rank} PH / #{unirank.world_rank} Global
-                    </span>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <Building2 className="text-pink-600 w-4 h-4 mt-0.5" />
-                    <span><strong>Dorm / Apartment:</strong> {dorm_apartment}</span>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <Bus className="text-indigo-600 w-4 h-4 mt-0.5" />
-                    <span><strong>Transport Access:</strong> {transport_access}</span>
-                  </div>
-
-                  <div className="mt-3">
-                    <p className="text-sm font-semibold text-gray-700 mb-1">
-                      🎓 Scholarships Offered:
-                    </p>
-                    <ul className="list-disc list-inside text-sm text-gray-700">
-                      {scholarships_offered.map((item, i) => (
-                        <li key={i}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="mt-4">
-                    <p className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2">
-                      <ImageIcon className="text-orange-500 w-4 h-4" />
-                      Virtual Tour / Photos:
-                    </p>
-                    <div className="relative">
-                      <img
-                        src={`/images/${virtual_tour_photos[photoIndex]}`}
-                        alt={`Photo ${photoIndex + 1}`}
-                        className="w-full h-48 object-cover rounded-xl border"
-                      />
-                      {virtual_tour_photos.length > 1 && (
-                        <div className="flex justify-between mt-2 text-sm">
-                          <button
-                            onClick={() =>
-                              setPhotoIndex(
-                                (photoIndex - 1 + virtual_tour_photos.length) %
-                                  virtual_tour_photos.length
-                              )
-                            }
-                            className="text-blue-600 hover:underline"
-                          >
-                            ◀ Prev
-                          </button>
-                          <button
-                            onClick={() =>
-                              setPhotoIndex((photoIndex + 1) % virtual_tour_photos.length)
-                            }
-                            className="text-blue-600 hover:underline"
-                          >
-                            Next ▶
-                          </button>
-                        </div>
+        <table className="min-w-full border border-gray-200 rounded-lg bg-white">
+          <thead>
+            <tr>
+              <th className="p-4 border-b border-gray-200 bg-gray-100 text-left text-gray-600 font-medium">
+                Specification
+              </th>
+              {selectedSchools.map((school, i) => {
+                const data = findSchoolData(school.school, schoolsData);
+                return (
+                  <th
+                    key={i}
+                    className="p-4 border-b border-gray-200 text-center text-gray-800 font-medium"
+                  >
+                    <div className="flex flex-col items-center">
+                      {data?.logo && (
+                        <img
+                          src={`/logos/${data.logo}`}
+                          alt={school.school}
+                          className="w-12 h-12 object-contain mb-2"
+                        />
                       )}
+                      <span>{school.school}</span>
                     </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {specs.map((spec, idx) => (
+              <tr key={idx} className="hover:bg-gray-50 transition">
+                <td className="p-4 border-t border-gray-200 text-gray-700 font-medium">
+                  {spec.label}
+                </td>
+                {selectedSchools.map((school, i) => {
+                  const data = findSchoolData(school.school, schoolsData);
+
+                  let value;
+                  if (spec.key === "program") {
+                    value = school.program || "No data available";
+                  } else {
+                    value = spec.format
+                      ? spec.format(data?.[spec.key])
+                      : data?.[spec.key] || "No data available";
+                  }
+
+                  return (
+                    <td
+                      key={i}
+                      className="p-4 border-t border-gray-200 text-gray-600 text-center"
+                    >
+                      {value}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );

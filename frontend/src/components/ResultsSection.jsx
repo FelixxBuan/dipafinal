@@ -12,7 +12,6 @@ import {
   Ruler
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import schoolStrengths from "../data/school_strengths.json";
 
 const knownCities = [
   "San Fernando", "Angeles", "Mabalacat", "Apalit", "Bacolor", "Candaba", "Magalang", "Malolos", "Mexico", "Porac"
@@ -53,6 +52,7 @@ function ResultsSection({ results, message }) {
   const [manualCity, setManualCity] = useState(
     localStorage.getItem("manualCity") || ""
   );
+  const [schoolStrengths, setSchoolStrengths] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -90,6 +90,28 @@ function ResultsSection({ results, message }) {
       );
     }
   }, []);
+
+  useEffect(() => {
+  fetch("http://localhost:8000/api/school-strengths")
+    .then((res) => {
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      return res.json();
+    })
+    .then((data) => {
+      // data.schools is an array of school objects
+      const dataObject = {};
+      data.schools.forEach((school) => {
+        dataObject[school.name] = school;
+      });
+      setSchoolStrengths(dataObject);
+    })
+    .catch((error) => {
+      console.error("Error fetching school strengths:", error);
+      setSchoolStrengths({});
+    });
+}, []);
+
+
 
   const displayedCity = manualCity || userCity;
 
@@ -154,14 +176,26 @@ function ResultsSection({ results, message }) {
       )}
 
       {results.map((item, index) => {
+         console.log("All schoolStrength keys:", Object.keys(schoolStrengths));
+    console.log("item.school value:", item.school);
+    console.log("Comparison:", Object.keys(schoolStrengths).includes(item.school));
         const isExpanded = expandedIndex === index;
         const isSelected = selectedSchools.some(
           (school) =>
             school.school === item.school && school.program === item.program
         );
+        console.log("School:", item.school);
+console.log("Maps query:", schoolStrengths[item.school]?.maps_query);
+console.log("Coords:", schoolStrengths[item.school]?.coords);
+
 
         const schoolInfo = schoolStrengths[item.school] || {};
         const mapsQuery = schoolInfo.maps_query;
+
+
+        console.log("Item school:", item.school);
+
+  
 
         let referenceLocation = userLocation;
         if (manualCity && cityCoordinates[manualCity]) {
@@ -243,11 +277,11 @@ function ResultsSection({ results, message }) {
                 </p>
                 <p className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-green-600" />
-                  <strong>Tuition/Sem:</strong> {item.tuition_per_semester || "N/A"}
+                  <strong>Tuition/Sem:</strong> {item.tuition_per_semester || "Enjoy free tuition under this government-supported academic program."}
                 </p>
                 <p className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-green-600" />
-                  <strong>Tuition/Year:</strong> {item.tuition_annual || "N/A"}
+                  <strong>Tuition/Year:</strong> {item.tuition_annual || "Enjoy free tuition under this government-supported academic program."}
                 </p>
                 <p className="flex items-center gap-2">
                   <GraduationCap className="w-4 h-4 text-purple-600" />
@@ -321,16 +355,18 @@ function ResultsSection({ results, message }) {
       {selectedSchools.length >= 2 && (
         <div className="text-center mt-6">
           <button
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl shadow"
-            onClick={() => navigate("/compare", { state: { selectedSchools } })}
-          >
-            Compare Now ({selectedSchools.length})
-          </button>
+  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl shadow"
+  onClick={() => navigate("/compare-program", { state: { selectedSchools } })}
+>
+  Compare Now ({selectedSchools.length})
+</button>
+
         </div>
       )}
     </div>
   );
 }
+
 
 ResultsSection.propTypes = {
   results: PropTypes.array.isRequired,

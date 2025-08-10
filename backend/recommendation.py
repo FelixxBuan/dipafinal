@@ -2,21 +2,42 @@ import json
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 import numpy as np
+from pymongo import MongoClient
 
 model = SentenceTransformer("all-mpnet-base-v2")
 
-with open("data/program_vectors.json", "r", encoding="utf-8") as f:
-    program_data = json.load(f)
+# MongoDB connection (same as main.py)
+MONGO_URI = "mongodb+srv://felixxbuan:QodcG7NvTkttyTUB@cluster0.poimocp.mongodb.net/"
+client = MongoClient(MONGO_URI)
+db = client["unifinder"]
 
-THRESHOLD = 0.3
+# Load program_data from MongoDB
+program_data = list(db["program_vectors"].find({}, {"_id": 0}))
+
+# Load rankings_data from MongoDB (get 'programs' field from first doc)
+rankings_doc = db["school_rankings"].find_one({}, {"_id": 0})
+rankings_data = rankings_doc["programs"] if rankings_doc and "programs" in rankings_doc else {}
+
+THRESHOLD = 0.4
+CATEGORY_WEIGHT = 0.3  # weight of the school rating in final score
+
+
+def get_school_rating(school_name, category):
+    ranked_list = rankings_data.get(category, [])
+    for school in ranked_list:
+        if school_name.lower() in school["school"].lower():
+            return school["rating"]
+    return None
+
 
 def recommend(answers: dict, school_type: str = None, locations: list[str] = None, max_budget: float = None):
     print("\n📊 Starting Program Matching Breakdown")
 
     # Step 1: Per-question vectorization
     vectors = {}
-    print("\n📥 Question-wise Input Vectorization:")
-    for key in ["subjects", "fields", "activities", "skills", "tools", "workStyle", "impact"]:
+    print("\n📅 Question-wise Input Vectorization:")
+    for key in ["academics", "fields", "activities", "goals", "environment"]:
+
         items = answers.get(key, [])
         custom = answers.get("custom", {}).get(key, "")
         merged = items + ([custom] if custom.strip() else [])
@@ -41,7 +62,7 @@ def recommend(answers: dict, school_type: str = None, locations: list[str] = Non
 
     combined_vector = np.mean(valid_vectors, axis=0).reshape(1, -1)
 
-    print("\n🧮 Average (Combined) User Vector:")
+    print("\n🧪 Average (Combined) User Vector:")
     print(f"   🔸 Dimensions: {combined_vector.shape[1]}")
     print(f"   🔸 First 5 values: {combined_vector[0][:5]}")
 
@@ -71,16 +92,20 @@ def recommend(answers: dict, school_type: str = None, locations: list[str] = Non
 
         # 📈 Cosine similarity
         program_vector = np.array(entry["vector"]).reshape(1, -1)
-        score = cosine_similarity(program_vector, combined_vector)[0][0]
-        rounded_score = round(score, 3)
+        similarity_score = cosine_similarity(program_vector, combined_vector)[0][0]
+
+        category = entry.get("category")
+        rating_score = get_school_rating(entry["school"], category) or 0
+        final_score = round((similarity_score * (1 - CATEGORY_WEIGHT)) + (rating_score / 10 * CATEGORY_WEIGHT), 3)
 
         result_item = {
             "school": entry["school"],
             "program": entry["name"],
             "description": entry["description"],
-            "score": rounded_score,
+            "score": final_score,
             "tuition_per_semester": entry.get("tuition_per_semester"),
             "tuition_annual": entry.get("tuition_annual"),
+            "tuition_notes": entry.get("tuition_notes"),
             "admission_requirements": entry.get("admission_requirements"),
             "grade_requirements": entry.get("grade_requirements"),
             "school_requirements": entry.get("school_requirements"),
@@ -88,28 +113,37 @@ def recommend(answers: dict, school_type: str = None, locations: list[str] = Non
             "school_type": entry.get("school_type"),
             "location": entry.get("location"),
             "school_logo": entry.get("school_logo"),
+            "board_passing_rate": entry.get("board_passing_rate"),
+            "category": category,
         }
 
-        if score >= THRESHOLD:
+        if similarity_score >= THRESHOLD:
             strong_matches.append(result_item)
         else:
             weak_matches.append(result_item)
 
-        print(f"🏫 {entry['school']} - {entry['name']}: {score:.3f}")
+        print(f"🏫 {entry['school']} - {entry['name']}: Similarity={similarity_score:.3f}, Rating={rating_score}, Final={final_score:.3f}")
 
     strong_matches.sort(key=lambda x: x["score"], reverse=True)
     weak_matches.sort(key=lambda x: x["score"], reverse=True)
+
+    top_category = strong_matches[0].get("category") if strong_matches else None
+    top_ranked_schools = rankings_data.get(top_category, [])[:5] if top_category else []
 
     if not strong_matches:
         return {
             "type": "fallback",
             "message": "We couldn't find a strong match for your interest, so here are a few programs you might explore.",
             "results": weak_matches[:3],
-            "weak_matches": weak_matches[3:7]
+            "weak_matches": weak_matches[3:7],
+            "matched_category": top_category,
+            "top_schools_for_category": top_ranked_schools
         }
 
     return {
         "type": "exact",
-        "results": strong_matches[:5],
-        "weak_matches": weak_matches[:5]
+        "results": strong_matches[:10],
+        "weak_matches": weak_matches[:10],
+        "matched_category": top_category,
+        "top_schools_for_category": top_ranked_schools
     }

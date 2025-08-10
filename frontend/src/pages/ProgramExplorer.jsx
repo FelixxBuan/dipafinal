@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import {
   MapPin,
@@ -8,7 +8,12 @@ import {
   FileText,
   ClipboardList,
   StickyNote,
-  Search
+  Search,
+  GraduationCap,
+  BookOpen,
+  ListChecks,
+  Building2,
+  Link as LinkIcon
 } from "lucide-react";
 
 export default function ProgramExplorer() {
@@ -25,50 +30,46 @@ export default function ProgramExplorer() {
   ];
 
   const categoryOptions = [
-    "Engineering",
-    "Business",
-    "Education",
-    "Information Technology",
-    "Health Sciences",
-    "Hospitality",
-    "Social Sciences",
-    "Agriculture",
-    "Arts and Design",
-    "Maritime",
-    "Law",
-    "Architecture",
+    "Business", "Computing Studies", "Accounting",
+    "Engineering", "Education", "Hospitality and Service", "Social Science",
+    "Maritime", "Language", "Medicine", "Communication", "Architecture",
+    "Science", "Mathematics", "Sports", "Logistics", "Industrial Technology",
+    "Arts and Design", "Arts and Culture", "Arts and History",
+    "Agriculture and Fisheries"
   ];
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/programs/all")
-      .then((res) => setPrograms(res.data))
-      .catch((err) => console.error("Failed to fetch programs:", err));
+    fetch("http://localhost:8000/programs/from-file")
+      .then((res) => res.json())
+      .then((data) => setPrograms(data))
+      .catch((err) => console.error("Error fetching vector programs:", err));
   }, []);
 
-  const filteredPrograms = programs.filter((program) => {
-    const programTown = program.location.split(",")[0].trim();
+  const filteredPrograms = useMemo(() => {
+    return programs.filter((program) => {
+      const programTown = program.location.split(",")[0].trim();
 
-    const matchesSearch =
-      program.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      program.school.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch =
+        program.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        program.school.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesLocation =
-      !selectedLocation || programTown === selectedLocation;
+      const matchesLocation =
+        !selectedLocation || programTown === selectedLocation;
 
-    const matchesSchoolType =
-      !selectedSchoolType || program.school_type === selectedSchoolType;
+      const matchesSchoolType =
+        !selectedSchoolType || program.school_type === selectedSchoolType;
 
-    const matchesCategory =
-      !selectedCategory || program.category === selectedCategory;
+      const matchesCategory =
+        !selectedCategory || program.category === selectedCategory;
 
-    return (
-      matchesSearch &&
-      matchesLocation &&
-      matchesSchoolType &&
-      matchesCategory
-    );
-  });
+      return (
+        matchesSearch &&
+        matchesLocation &&
+        matchesSchoolType &&
+        matchesCategory
+      );
+    });
+  }, [programs, searchTerm, selectedLocation, selectedSchoolType, selectedCategory]);
 
   const filteredLocationOptions =
     selectedSchoolType === "Private"
@@ -122,7 +123,7 @@ export default function ProgramExplorer() {
           className="px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring"
         >
           <option value="">Select school type</option>
-          {['Public', 'Private'].map((type, idx) => (
+          {["Public", "Private"].map((type, idx) => (
             <option key={idx} value={type}>
               {type}
             </option>
@@ -203,49 +204,59 @@ export default function ProgramExplorer() {
               <p className="text-sm font-medium">{selected.school}</p>
             </div>
 
-            <div className="space-y-2 text-sm text-gray-700">
-              <p>
-                <MapPin className="inline w-4 h-4 mr-1 text-red-400" />
-                {selected.location}
+            {/* Updated info layout */}
+            <div className="mt-5 space-y-2 text-sm text-gray-700 animate-fade-in">
+              <p className="flex items-center gap-2">
+                <Landmark className="w-4 h-4 text-blue-600" />
+                <strong>Type:</strong> {selected.school_type || "N/A"}
               </p>
-              <p>
-                <Landmark className="inline w-4 h-4 mr-1 text-green-400" />
-                {selected.school_type}
+              <p className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-red-500" />
+                <strong>Location:</strong> {selected.location || "N/A"}
               </p>
-              <p>
-                <BadgeDollarSign className="inline w-4 h-4 mr-1 text-yellow-500" />
-                Tuition/Semester: {selected.tuition_per_semester ? `₱${selected.tuition_per_semester}` : "N/A"}
+              <p className="flex items-center gap-2">
+                <BadgeDollarSign className="w-4 h-4 text-green-600" />
+                <strong>Tuition/Sem:</strong> {selected.tuition_per_semester || "Enjoy free tuition under this government-supported academic program."}
               </p>
-              <p>
-                <BadgeDollarSign className="inline w-4 h-4 mr-1 text-yellow-500" />
-                Tuition/Year: {selected.tuition_annual ? `₱${selected.tuition_annual}` : "N/A"}
+              <p className="flex items-center gap-2">
+                <BadgeDollarSign className="w-4 h-4 text-green-600" />
+                <strong>Tuition/Year:</strong> {selected.tuition_annual || "Enjoy free tuition under this government-supported academic program."}
               </p>
-              <p>
-                <StickyNote className="inline w-4 h-4 mr-1 text-purple-400" />
-                {selected.tuition_notes || "No additional notes."}
+              <p className="flex items-center gap-2">
+                <GraduationCap className="w-4 h-4 text-purple-600" />
+                <strong>Board Passing Rate:</strong> {selected.board_passing_rate || "N/A"}
               </p>
-              <p>
-                <ClipboardList className="inline w-4 h-4 mr-1 text-orange-400" />
-                Admission: {selected.admission_requirements}
+              <p className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-blue-600" />
+                <strong>Category:</strong> {selected.category || "N/A"}
               </p>
-              <p>
-                <ClipboardList className="inline w-4 h-4 mr-1 text-orange-400" />
-                Grade Requirement: {selected.grade_requirements}
+              <p className="flex items-center gap-2">
+                <BadgeDollarSign className="w-4 h-4 text-yellow-500" />
+                <strong>Special Note:</strong> {selected.tuition_notes || "N/A"}
               </p>
-              <p>
-                <FileText className="inline w-4 h-4 mr-1 text-cyan-500" />
-                Requirements: {selected.school_requirements}
+              <p className="flex items-center gap-2">
+                <ClipboardList className="w-4 h-4 text-yellow-600" />
+                <strong>Admission Requirements:</strong> {selected.admission_requirements || "N/A"}
+              </p>
+              <p className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-indigo-500" />
+                <strong>Grade Requirements:</strong> {selected.grade_requirements || "N/A"}
+              </p>
+              <p className="flex items-center gap-2">
+                <ListChecks className="w-4 h-4 text-teal-600" />
+                <strong>School Requirements:</strong> {selected.school_requirements || "N/A"}
               </p>
               {selected.school_website && (
-                <p>
-                  <Globe className="inline w-4 h-4 mr-1 text-blue-500" />
+                <p className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-blue-500" />
+                  <strong>Website:</strong>{" "}
                   <a
                     href={selected.school_website}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 underline"
                   >
-                    Visit Website
+                    {selected.school_website}
                   </a>
                 </p>
               )}
