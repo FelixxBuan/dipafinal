@@ -1,85 +1,147 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import Navbar from "../components/navbar";
+import {
+  GraduationCap,
+  BookOpen,
+  Building2,
+  MapPin,
+  ListChecks,
+  FileText,
+  DollarSign,
+  Globe,
+} from "lucide-react";
+
+/** Helpers */
+const hasValue = (v) => {
+  if (v === 0) return true;
+  if (Array.isArray(v)) return v.length > 0;
+  if (typeof v === "string") return v.trim().length > 0;
+  return v !== null && v !== undefined;
+};
+
+const valueOf = (obj, aliases) => {
+  for (const key of aliases) {
+    if (Object.prototype.hasOwnProperty.call(obj ?? {}, key)) {
+      const v = obj[key];
+      if (hasValue(v)) return v;
+      return v;
+    }
+  }
+  return null;
+};
+
+const renderValue = (v) => {
+  if (!hasValue(v)) return "N/A";
+  if (Array.isArray(v)) return v.join(", ");
+  if (typeof v === "object") return JSON.stringify(v);
+  return String(v);
+};
+
+/** Normalize fields */
+const normalizeSchool = (school) => {
+  const n = {};
+  n.school = valueOf(school, ["school", "school_name", "name"]);
+  n.school_logo = valueOf(school, ["school_logo", "logo", "image"]);
+  n.program = valueOf(school, ["program", "course", "degree"]);
+  n.category = valueOf(school, ["category", "field", "discipline"]);
+  n.school_type = valueOf(school, ["school_type", "type"]);
+  n.location = valueOf(school, ["location", "city", "address"]);
+  n.admission_requirements = valueOf(school, ["admission_requirements", "admission"]);
+  n.grade_requirements = valueOf(school, ["grade_requirements", "gwa_requirement"]);
+  n.school_requirements = valueOf(school, ["school_requirements", "other_requirements"]);
+  n.tuition_per_semester = valueOf(school, ["tuition_per_semester", "tuition_semester"]);
+  n.tuition_annual = valueOf(school, ["tuition_annual", "annual_tuition"]);
+  n.tuition_notes = valueOf(school, ["tuition_notes", "notes"]);
+  n.board_passing_rate = valueOf(school, ["board_passing_rate", "passing_rate"]);
+  n.school_website = valueOf(school, ["school_website", "website"]);
+  return n;
+};
 
 export default function CompareProgram() {
   const location = useLocation();
   const navigate = useNavigate();
   const selectedSchools = location.state?.selectedSchools || [];
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   if (!selectedSchools.length) {
     return (
-      <div className="p-8 text-center text-gray-500">
-        <p>No schools selected for comparison.</p>
-        <button
-          onClick={() => navigate(-1)}
-          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow"
-        >
-          Go Back
-        </button>
+      <div className="min-h-screen bg-gradient-to-br from-[#020617] to-[#0a0f1f] pt-20 px-4 text-white">
+        <Navbar />
+        <div className="p-8 text-center text-white">
+          <p>No schools selected for comparison.</p>
+          <button
+            onClick={() => navigate(-1)}
+            className="!px-8 !py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out"
+            style={{ WebkitBackdropFilter: "blur(10px)", backdropFilter: "blur(10px)" }}
+          >
+            Go Back
+          </button>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Compare Programs</h1>
+  const normalizedSchools = selectedSchools.map((s) => normalizeSchool(s));
 
-      <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
-        <table className="min-w-full border-collapse">
-          <thead className="bg-gray-100 border-b border-gray-200">
+  const rows = [
+  { label: "Program", key: "program", icon: <BookOpen className="w-4 h-4 inline mr-1 text-green-400" /> },
+  { label: "Category", key: "category", icon: <ListChecks className="w-4 h-4 inline mr-1 text-purple-400" /> },
+  { label: "Type", key: "school_type", icon: <Building2 className="w-4 h-4 inline mr-1 text-orange-400" /> },
+  { label: "Location", key: "location", icon: <MapPin className="w-4 h-4 inline mr-1 text-red-400" /> },
+  { label: "Admission Requirements", key: "admission_requirements", icon: <FileText className="w-4 h-4 inline mr-1 text-teal-400" /> },
+  { label: "Grade Requirements", key: "grade_requirements", icon: <ListChecks className="w-4 h-4 inline mr-1 text-pink-400" /> },
+  { label: "Other Requirements", key: "school_requirements", icon: <FileText className="w-4 h-4 inline mr-1 text-yellow-400" /> },
+  { label: "Tuition / Semester", key: "tuition_per_semester", icon: <DollarSign className="w-4 h-4 inline mr-1 text-emerald-400" /> },
+  { label: "Tuition / Year", key: "tuition_annual", icon: <DollarSign className="w-4 h-4 inline mr-1 text-lime-400" /> },
+  { label: "Tuition Notes", key: "tuition_notes", icon: <FileText className="w-4 h-4 inline mr-1 text-sky-400" /> },
+  { label: "Board Passing Rate", key: "board_passing_rate", icon: <GraduationCap className="w-4 h-4 inline mr-1 text-indigo-400" /> },
+  { label: "Website", key: "school_website", icon: <Globe className="w-4 h-4 inline mr-1 text-cyan-400" />, isLink: true },
+];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#020617] to-[#0a0f1f] pt-20 px-4 text-white pb-24">
+      <Navbar />
+
+      <div className="overflow-x-auto mt-8">
+        <table className="min-w-full border border-white/20 text-sm text-center">
+          <thead>
             <tr>
-              <th className="p-3 text-left text-sm font-semibold text-gray-700">Field</th>
-              {selectedSchools.map((school, idx) => (
-                <th key={idx} className="p-3 text-center text-sm font-semibold text-gray-700">
-                  {school.school_logo && (
-                    <div className="mb-2 flex justify-center">
-                      <img
-                        src={school.school_logo}
-                        alt={school.school}
-                        className="w-12 h-12 object-contain"
-                      />
-                    </div>
+              {normalizedSchools.map((s, idx) => (
+                <th key={idx} className="p-4 border border-white/20 bg-blue-900/40">
+                  {hasValue(s.school_logo) && (
+                    <img
+                      src={s.school_logo}
+                      alt={s.school}
+                      className="w-16 h-16 mx-auto object-contain rounded-full bg-white p-1 mb-2"
+                    />
                   )}
-                  {school.school}
+                  <div className="font-bold">{renderValue(s.school)}</div>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {[
-              { key: "program", label: "Program Name" },
-              { key: "category", label: "Category" },
-              { key: "school_type", label: "School Type" },
-              { key: "location", label: "Location" },
-              { key: "admission_requirements", label: "Admission Requirements" },
-              { key: "grade_requirements", label: "Grade Requirements" },
-              { key: "school_requirements", label: "School Requirements" },
-              { key: "tuition_per_semester", label: "Tuition Fee" },
-              { key: "tuition_annual", label: "Tuition (Annual)" },
-              { key: "tuition_notes", label: "Tuition Notes" },
-              { key: "board_passing_rate", label: "Board Passing Rate" },
-              { key: "school_website", label: "School Website for more information" }
-            ].map((field) => (
-              <tr
-                key={field.key}
-                className="border-b border-gray-100 hover:bg-gray-50 transition"
-              >
-                <td className="p-3 text-sm font-medium text-gray-600">{field.label}</td>
-                {selectedSchools.map((school, idx) => (
-                  <td
-                    key={idx}
-                    className="p-3 text-sm text-gray-800 text-center"
-                  >
-                    {field.key === "school_website" && school[field.key] ? (
+            {rows.map((row, rIdx) => (
+              <tr key={rIdx} className="hover:bg-blue-800/10">
+                {normalizedSchools.map((s, cIdx) => (
+                  <td key={cIdx} className="p-3 border border-white/20">
+                    {row.isLink && hasValue(s[row.key]) ? (
                       <a
-                        href={school[field.key]}
+                        href={s[row.key]}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 underline"
+                        className="text-blue-300 underline hover:text-blue-100"
                       >
                         Visit
                       </a>
                     ) : (
-                      school[field.key] || "N/A"
+                      <>
+                        {row.icon} {renderValue(s[row.key])}
+                      </>
                     )}
                   </td>
                 ))}
@@ -89,17 +151,19 @@ export default function CompareProgram() {
         </table>
       </div>
 
-      <div className="mt-6 flex gap-4">
+      {/* Bottom Buttons */}
+      <div className="mt-10 flex gap-4 justify-center">
         <button
           onClick={() => navigate(-1)}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg shadow"
+          className="!px-8 !py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out"
+          style={{ WebkitBackdropFilter: "blur(10px)", backdropFilter: "blur(10px)" }}
         >
           Back to Results
         </button>
         <button
-          onClick={() => navigate("/Compare", { state: { selectedSchools } })
-}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow"
+          onClick={() => navigate("/Compare", { state: { selectedSchools } })}
+          className="!px-8 !py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out"
+          style={{ WebkitBackdropFilter: "blur(10px)", backdropFilter: "blur(10px)" }}
         >
           Compare Schools
         </button>
