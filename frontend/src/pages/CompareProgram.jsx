@@ -88,30 +88,32 @@ export default function CompareProgram() {
   const normalizedSchools = selectedSchools.map((s) => normalizeSchool(s));
 
   const rows = [
-  { label: "Program", key: "program", icon: <BookOpen className="w-4 h-4 inline mr-1 text-green-400" /> },
-  { label: "Category", key: "category", icon: <ListChecks className="w-4 h-4 inline mr-1 text-purple-400" /> },
-  { label: "Type", key: "school_type", icon: <Building2 className="w-4 h-4 inline mr-1 text-orange-400" /> },
-  { label: "Location", key: "location", icon: <MapPin className="w-4 h-4 inline mr-1 text-red-400" /> },
-  { label: "Admission Requirements", key: "admission_requirements", icon: <FileText className="w-4 h-4 inline mr-1 text-teal-400" /> },
-  { label: "Grade Requirements", key: "grade_requirements", icon: <ListChecks className="w-4 h-4 inline mr-1 text-pink-400" /> },
-  { label: "Other Requirements", key: "school_requirements", icon: <FileText className="w-4 h-4 inline mr-1 text-yellow-400" /> },
-  { label: "Tuition / Semester", key: "tuition_per_semester", icon: <DollarSign className="w-4 h-4 inline mr-1 text-emerald-400" /> },
-  { label: "Tuition / Year", key: "tuition_annual", icon: <DollarSign className="w-4 h-4 inline mr-1 text-lime-400" /> },
-  { label: "Tuition Notes", key: "tuition_notes", icon: <FileText className="w-4 h-4 inline mr-1 text-sky-400" /> },
-  { label: "Board Passing Rate", key: "board_passing_rate", icon: <GraduationCap className="w-4 h-4 inline mr-1 text-indigo-400" /> },
-  { label: "Website", key: "school_website", icon: <Globe className="w-4 h-4 inline mr-1 text-cyan-400" />, isLink: true },
-];
+    { label: "Program", key: "program", icon: <BookOpen className="w-4 h-4 inline mr-1 text-sky-400" /> },
+    { label: "Category", key: "category", icon: <ListChecks className="w-4 h-4 inline mr-1 text-sky-400" /> },
+    { label: "Type", key: "school_type", icon: <Building2 className="w-4 h-4 inline mr-1 text-sky-400" /> },
+    { label: "Location", key: "location", icon: <MapPin className="w-4 h-4 inline mr-1 text-sky-400" /> },
+    { label: "Admission Requirements", key: "admission_requirements", icon: <FileText className="w-4 h-4 inline mr-1 text-sky-400" /> },
+    { label: "Grade Requirements", key: "grade_requirements", icon: <ListChecks className="w-4 h-4 inline mr-1 text-sky-400" /> },
+    { label: "Other Requirements", key: "school_requirements", icon: <FileText className="w-4 h-4 inline mr-1 text-sky-400" /> },
+    { label: "Tuition / Semester", key: "tuition_per_semester", icon: <DollarSign className="w-4 h-4 inline mr-1 text-sky-400" /> },
+    { label: "Tuition / Year", key: "tuition_annual", icon: <DollarSign className="w-4 h-4 inline mr-1 text-sky-400" /> },
+    { label: "Tuition Notes", key: "tuition_notes", icon: <FileText className="w-4 h-4 inline mr-1 text-sky-400" /> },
+    { label: "Board Passing Rate", key: "board_passing_rate", icon: <GraduationCap className="w-4 h-4 inline mr-1 text-sky-400" /> },
+    { label: "Website", key: "school_website", icon: <Globe className="w-4 h-4 inline mr-1 text-sky-400" />, isLink: true },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#020617] to-[#0a0f1f] pt-20 px-4 text-white pb-24">
       <Navbar />
 
-      <div className="overflow-x-auto mt-8">
-        <table className="min-w-full border border-white/20 text-sm text-center">
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto mt-8">
+        <table className="min-w-full border border-white/20 text-sm">
           <thead>
             <tr>
+              <th className="sticky left-0 bg-[#0a0f1f] p-4 border border-white/20 text-left z-10">Feature</th>
               {normalizedSchools.map((s, idx) => (
-                <th key={idx} className="p-4 border border-white/20 bg-blue-900/40">
+                <th key={idx} className="p-4 border border-white/20 bg-blue-900/40 text-center">
                   {hasValue(s.school_logo) && (
                     <img
                       src={s.school_logo}
@@ -119,16 +121,22 @@ export default function CompareProgram() {
                       className="w-16 h-16 mx-auto object-contain rounded-full bg-white p-1 mb-2"
                     />
                   )}
-                  <div className="font-bold">{renderValue(s.school)}</div>
+                  <div className="font-semibold text-gray-100">{renderValue(s.school)}</div>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {rows.map((row, rIdx) => (
-              <tr key={rIdx} className="hover:bg-blue-800/10">
+              <tr key={rIdx} className="hover:bg-blue-900/30 transition-colors">
+                {/* Feature column */}
+                <td className="sticky left-0 bg-[#0a0f1f] z-10 p-3 border border-white/20 text-left font-medium text-gray-200">
+                  {row.icon} {row.label}
+                </td>
+
+                {/* Values */}
                 {normalizedSchools.map((s, cIdx) => (
-                  <td key={cIdx} className="p-3 border border-white/20">
+                  <td key={cIdx} className="p-3 border border-white/20 text-center text-gray-300">
                     {row.isLink && hasValue(s[row.key]) ? (
                       <a
                         href={s[row.key]}
@@ -136,12 +144,10 @@ export default function CompareProgram() {
                         rel="noopener noreferrer"
                         className="text-blue-300 underline hover:text-blue-100"
                       >
-                        Visit
+                        {new URL(s[row.key]).hostname.replace("www.", "")}
                       </a>
                     ) : (
-                      <>
-                        {row.icon} {renderValue(s[row.key])}
-                      </>
+                      renderValue(s[row.key])
                     )}
                   </td>
                 ))}
@@ -151,15 +157,50 @@ export default function CompareProgram() {
         </table>
       </div>
 
+      {/* Mobile Card View */}
+      <div className="block md:hidden space-y-6 mt-6">
+        {normalizedSchools.map((s, idx) => (
+          <div
+            key={idx}
+            className="bg-blue-800/20 rounded-xl p-4 border border-white/20 hover:bg-blue-800/30 transition-colors"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              {s.school_logo && <img src={s.school_logo} className="w-12 h-12 rounded-full bg-white p-1" />}
+              <h2 className="font-semibold text-gray-100">{s.school}</h2>
+            </div>
+            <ul className="divide-y divide-white/10 text-sm">
+              {rows.map((row, rIdx) => (
+                <li key={rIdx} className="py-2">
+                  <span className="font-medium text-gray-200">{row.label}: </span>
+                  {row.isLink && hasValue(s[row.key]) ? (
+                    <a
+                      href={s[row.key]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-300 underline hover:text-blue-100"
+                    >
+                      {new URL(s[row.key]).hostname.replace("www.", "")}
+                    </a>
+                  ) : (
+                    <span className="text-gray-300">{renderValue(s[row.key])}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
       {/* Bottom Buttons */}
       <div className="mt-10 flex gap-4 justify-center">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/results")}
           className="!px-8 !py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out"
           style={{ WebkitBackdropFilter: "blur(10px)", backdropFilter: "blur(10px)" }}
         >
           Back to Results
         </button>
+
         <button
           onClick={() => navigate("/Compare", { state: { selectedSchools } })}
           className="!px-8 !py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out"

@@ -144,7 +144,7 @@ function UniFinder() {
             <div className="bg-blue-300/20 p-3 rounded-md">
               <Heart className="text-blue-300 w-7 h-7" />
             </div>
-            <h2 className="text-3xl font-semibold font-poppins">{q.title}</h2>
+            <h2 className="text-2xl font-semibold font-poppins">{q.title}</h2>
           </div>
 
           <div className="flex flex-wrap gap-4">
