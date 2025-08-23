@@ -30,6 +30,13 @@ export default function ComparePage() {
   const selectedSchools = location.state?.selectedSchools || [];
   const [schoolsData, setSchoolsData] = useState([]);
 
+  // ✅ Remove duplicates (case-insensitive, normalized)
+  const uniqueSchools = Array.from(
+    new Map(
+      selectedSchools.map((school) => [normalize(school.school), school])
+    ).values()
+  );
+
   useEffect(() => {
     fetch("http://localhost:8000/api/school-strengths")
       .then((res) => {
@@ -77,97 +84,98 @@ export default function ComparePage() {
     <div className="min-h-screen bg-gradient-to-br from-[#020617] to-[#0a0f1f] pt-20 px-4 text-white pb-24">
       <Navbar />
 
-      {selectedSchools.length === 0 ? (
+      {uniqueSchools.length === 0 ? (
         <p className="text-center text-gray-400 font-Poppins">
           No schools selected. Please return and choose at least two.
         </p>
       ) : (
         <div>
           {/* Grid of Schools */}
-          {/* Grid of Schools */}
-<div
-  className={`mt-8 grid gap-6 justify-center ${
-    selectedSchools.length === 1
-      ? "grid-cols-1 max-w-md mx-auto"
-      : selectedSchools.length === 2
-      ? "grid-cols-1 sm:grid-cols-2 max-w-6xl mx-auto" // ⬅ wider for 2 cards
-      : "md:grid-cols-2 lg:grid-cols-3"
-  }`}
->
-  {selectedSchools.map((school, i) => {
-    const data = findSchoolData(school.school, schoolsData);
+          <div
+            className={`mt-8 grid gap-6 justify-center ${
+              uniqueSchools.length === 1
+                ? "grid-cols-1 max-w-md mx-auto"
+                : uniqueSchools.length === 2
+                ? "grid-cols-1 sm:grid-cols-2 max-w-6xl mx-auto"
+                : "md:grid-cols-2 lg:grid-cols-3"
+            }`}
+          >
+            {uniqueSchools.map((school, i) => {
+              const data = findSchoolData(school.school, schoolsData);
 
-    return (
-      <div
-        key={i}
-        className={`bg-blue-800/20 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-lg hover:shadow-xl transition ${
-          selectedSchools.length === 2 ? "w-full" : ""
-        }`}
-      >
-        {/* Logo */}
-        {data?.logo && (
-          <div className="flex justify-center mb-4">
-            <div className="bg-white p-2 rounded-full">
-              <img
-                src={`/logos/${data.logo}`}
-                alt={school.school}
-                className="w-16 h-16 object-contain"
-              />
-            </div>
-          </div>
-        )}
+              return (
+                <div
+                  key={i}
+                  className={`bg-blue-800/20 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-lg hover:shadow-xl transition ${
+                    uniqueSchools.length === 2 ? "w-full" : ""
+                  }`}
+                >
+                  {/* Logo */}
+                  {data?.logo && (
+                    <div className="flex justify-center mb-4">
+                      <div className="bg-white p-2 rounded-full">
+                        <img
+                          src={`/logos/${data.logo}`}
+                          alt={school.school}
+                          className="w-16 h-16 object-contain"
+                        />
+                      </div>
+                    </div>
+                  )}
 
-        {/* School Name */}
-        <h2 className="text-xl font-bold text-center mb-4 font-Merriweather">
-          {school.school}
-        </h2>
+                  {/* School Name */}
+                  <h2 className="text-xl font-bold text-center mb-4 font-Merriweather">
+                    {school.school}
+                  </h2>
 
-        {/* Specs */}
-        <ul className="divide-y divide-white/10 mt-4">
-          {specs.map((spec, idx) => {
-            const Icon = spec.icon;
-            const value = spec.format
-              ? spec.format(data?.[spec.key])
-              : data?.[spec.key] || "No data available";
+                  {/* Specs */}
+                  <ul className="divide-y divide-white/10 mt-4">
+                    {specs.map((spec, idx) => {
+                      const Icon = spec.icon;
+                      const value = spec.format
+                        ? spec.format(data?.[spec.key])
+                        : data?.[spec.key] || "No data available";
 
-            return (
-              <li
-                key={idx}
-                className="flex items-start gap-3 py-2 text-sm text-gray-200 font-Poppins"
-              >
-                <Icon className="w-5 h-5 mt-0.5 text-blue-300 shrink-0" />
-                <div>
-                  <p className="font-medium text-white font-Merriweather">
-                    {spec.label}
-                  </p>
-                  <p className="text-gray-400 font-Poppins">{value}</p>
+                      return (
+                        <li
+                          key={idx}
+                          className="flex items-start gap-3 py-2 text-sm text-gray-200 font-Poppins"
+                        >
+                          <Icon className="w-5 h-5 mt-0.5 text-blue-300 shrink-0" />
+                          <div>
+                            <p className="font-medium text-white font-Merriweather">
+                              {spec.label}
+                            </p>
+                            <p className="text-gray-400 font-Poppins">
+                              {value}
+                            </p>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    );
-  })}
+              );
+            })}
+          </div>
+
+         {/* Back Button */}
+<div className="mt-10 flex justify-center">
+  <button
+    onClick={() =>
+      navigate("/compare-program", { state: { selectedSchools } })
+    }
+    className="!px-8 !py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out flex items-center"
+    style={{
+      WebkitBackdropFilter: "blur(10px)",
+      backdropFilter: "blur(10px)",
+    }}
+  >
+    <ArrowLeft className="w-5 h-5 mr-2" />
+    Back
+  </button>
 </div>
 
-
-          {/* Back Button */}
-          <div className="mt-10">
-            <button
-              onClick={() =>
-                navigate("/compare-program", { state: { selectedSchools } })
-              }
-              className="!px-8 !py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out flex items-center"
-              style={{
-                WebkitBackdropFilter: "blur(10px)",
-                backdropFilter: "blur(10px)",
-              }}
-            >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back to Compare Program
-            </button>
-          </div>
         </div>
       )}
     </div>

@@ -1,8 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Heart, MapPin, DollarSign, School, Search } from "lucide-react"
+import { Heart, MapPin, DollarSign, School, Search, HelpCircle } from "lucide-react"
 import Navbar from "../components/navbar"
-import Footer from "../components/Footer"
 
 function UniFinder() {
   const [step, setStep] = useState(1)
@@ -23,9 +22,6 @@ function UniFinder() {
   const [locations, setLocations] = useState([])
   const [maxBudget, setMaxBudget] = useState(50000)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-
-  
-
 
   const handleCheckboxChange = (questionKey, choice) => {
     setAnswers(prevAnswers => {
@@ -58,9 +54,9 @@ function UniFinder() {
 
   const questions = [
     { key: "academics", title: "What subjects or academic areas do you enjoy the most?", choices: ["Math", "Science", "English", "History or Social Studies", "PE or Sports", "Arts or Design", "Technology or ICT", "Business or Economics", "Foreign Languages"] },
-    { key: "fields", title: "Which fields or careers are you most drawn to?", choices: ["Engineering & Architecture", "Business & Entrepreneurship", "Arts & Media", "Healthcare & Medicine", "Education & Teaching", "Social Work", "Law & Government", "Science & Research", "Technology"] },
-    { key: "activities", title: "What kinds of tasks or activities do you enjoy doing?", choices: ["Designing", "Solving puzzles or problems", "Writing", "Building or fixing things", "Helping or mentoring others", "Researching or analyzing", "Speaking or presenting", "Working in teams or leading", "Hands-on"] },
-    { key: "goals", title: "What goals matter most to you in a future career?", choices: ["Innovating", "Making a positive impact on people’s lives", "Educating", "Advancing technology", "Protecting the environment", "Supporting communities", "Business growth", "Promoting justice",] },
+    { key: "fields", title: "Which fields or careers are you most drawn to?", choices: ["Engineering & Architecture", "Arts & Media", "Healthcare & Medicine", "Education & Teaching", "Social Work", "Law & Government", "Science & Research", "Technology"] },
+    { key: "activities", title: "What kinds of tasks or activities do you enjoy doing?", choices: ["Designing", "Solving puzzles or problems", "Writing", "Building or fixing things", "Helping or mentoring others", "Researching or analyzing", "Speaking or presenting"] },
+    { key: "goals", title: "What goals matter most to you in a future career?", choices: ["Innovating", "Making a positive impact on people’s lives", "Educating","Business growth", "Promoting justice","Protecting the environment",] },
     { key: "environment", title: "What environment or setting do you see yourself working in?", choices: ["Office", "Academic setting", "Hospitals", "Outdoor", "Workshop or laboratory", "Creative space", "Tech-driven", "Government institutions", "freelance setup"] }
   ];
 
@@ -81,47 +77,85 @@ function UniFinder() {
     navigate("/results")
   }
 
-  const ProgressBar = () => {
-  const totalSteps = 3;
-  const percent = Math.round((step / totalSteps) * 100);
+const ProgressBar = () => {
+  const steps = [
+    { id: 1, label: "Questions", icon: <HelpCircle size={24} /> },
+    { id: 2, label: "School Type", icon: <School size={24} /> },
+    { id: 3, label: "Location", icon: <MapPin size={24} /> },
+  ];
+
+  // Progress calculation
+  let progressPercent = 0;
+
+  if (step === 1) {
+    // Only start moving after the 1st question
+    if (currentQuestionIndex === 0) {
+      progressPercent = 0; // still at circle 1
+    } else {
+      // 4 equal segments between circle 1 and circle 2
+      progressPercent =
+        (currentQuestionIndex / (questions.length - 1)) *
+        (100 / (steps.length - 1));
+    }
+  } else if (step === 2) {
+    progressPercent = 100 / (steps.length - 1); // exactly at circle 2
+  } else if (step === 3) {
+    progressPercent = 100; // full bar
+  }
 
   return (
-    <div className="mb-12 px-6">
-      {/* Step counter */}
-      <div className="text-center mb-2 text-blue-200 text-lg font-medium">
-        Step {step} of {totalSteps}
-      </div>
+    <div className="w-full max-w-3xl mx-auto mt-12 relative">
+      {/* Background Line */}
+      <div
+        className="absolute top-1/2 h-[6px] bg-blue-900 rounded-full transform -translate-y-1/2"
+        style={{ left: "4rem", right: "3rem" }}
+      ></div>
 
-      {/* Progress bar */}
-      <div className="w-full bg-white/10 rounded-full h-4 overflow-hidden relative">
-        <div
-          className="h-4 rounded-full"
-          style={{
-            width: `${percent}%`,
-            background: "rgba(59, 130, 246, 0.6)",
-            animation: "pulseBlue 2s ease-in-out infinite",
-          }}
-        />
-      </div>
+      {/* Progress Line */}
+      <div
+        className="absolute top-1/2 h-[6px] rounded-full bg-blue-400 shadow-[0_0_20px_4px_rgba(59,130,246,0.8)] transform -translate-y-1/2 transition-all duration-500"
+        style={{
+          left: "4rem",
+          width: `calc((100% - 7rem) * ${progressPercent / 100})`,
+        }}
+      ></div>
 
-      <style>
-        {`
-          @keyframes pulseBlue {
-            0% {
-              box-shadow: 0 0 8px rgba(59,130,246,0.5), 0 0 15px rgba(147,197,253,0.3);
-            }
-            50% {
-              box-shadow: 0 0 16px rgba(59,130,246,0.7), 0 0 30px rgba(147,197,253,0.5);
-            }
-            100% {
-              box-shadow: 0 0 8px rgba(59,130,246,0.5), 0 0 15px rgba(147,197,253,0.3);
-            }
+      {/* Circles */}
+      <div className="flex justify-between relative z-10 px-4">
+        {steps.map((s) => {
+          // Extra glow for Step 2 during question progress
+          let extraGlow = "";
+          if (s.id === 2 && step === 1 && currentQuestionIndex > 0) {
+            const progressToStep2 =
+              currentQuestionIndex / (questions.length - 1);
+            extraGlow = `shadow-[0_0_${10 + progressToStep2 * 20}px_${
+              2 + progressToStep2 * 4
+            }px_rgba(59,130,246,${0.3 + progressToStep2 * 0.5})]`;
           }
-        `}
-      </style>
+
+          return (
+            <div key={s.id} className="flex flex-col items-center">
+              <div
+                className={`w-14 h-14 flex items-center justify-center rounded-full border-2 transition-all duration-500
+                  ${
+                    s.id === step
+                      ? "bg-blue-900 text-white border-blue-400"
+                      : s.id < step
+                      ? "bg-blue-900 text-white border-blue-400"
+                      : "bg-blue-900 text-gray-400 border-blue-900/50"
+                  } ${extraGlow}`}
+              >
+                {s.icon}
+              </div>
+              <span className="mt-3 text-sm text-white">{s.label}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
+
 
   return (
     <>
@@ -144,7 +178,7 @@ function UniFinder() {
             <div className="bg-blue-300/20 p-3 rounded-md">
               <Heart className="text-blue-300 w-7 h-7" />
             </div>
-            <h2 className="text-2xl font-semibold font-poppins">{q.title}</h2>
+          <h2 className="text-2xl font-semibold font-inter">{q.title}</h2>
           </div>
 
           <div className="flex flex-wrap gap-4">
@@ -160,7 +194,7 @@ function UniFinder() {
                       ? "border-4 border-white" 
                       : "border-2 border-blue-400 opacity-80 hover:opacity-100"} 
                     bg-white/10 backdrop-blur-sm
-                    text-white font-merriweather
+                    text-white font-poppins
                   `}
                 >
                   {choice}
@@ -181,7 +215,7 @@ function UniFinder() {
               <div className="flex justify-between mt-4">
   {currentQuestionIndex > 0 ? (
     <button
-      className="px-6 py-3 rounded-xl text-lg font-merriweather text-white 
+      className="px-6 py-3 rounded-xl text-lg font-poppins text-white 
                  border border-white/20 backdrop-blur-sm transition
                  hover:border-blue-300"
       style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
@@ -217,12 +251,6 @@ function UniFinder() {
     </button>
   )}
 </div>
-
-            
-
-              
-
-              
               
             </>
           )}
@@ -230,26 +258,27 @@ function UniFinder() {
           {/* Step 2 */}
           {step === 2 && (
   <>
-    <div className="bg-blue-800/20 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg p-8">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="bg-blue-400/20 p-3 rounded-lg">
-          <School className="text-blue-300 w-7 h-7" />
+    <div className="bg-blue-800/20 backdrop-blur-md border border-white/20 
+                    rounded-xl shadow-lg p-6 max-w-3xl mx-auto">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="bg-blue-400/20 p-2.5 rounded-lg">
+          <School className="text-blue-300 w-6 h-6" />
         </div>
         <div>
-          <h2 className="text-3xl font-semibold font-poppins">Preferred School Type</h2>
-          <p className="text-base text-blue-100 font-merriweather">
+          <h2 className="text-xl font-bold font-inter">Preferred School Type</h2>
+          <p className="text-sm text-blue-100 font-poppins">
             Choose which type of school you prefer
           </p>
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {[{ value: "public", label: "Public Schools", desc: "State-funded, affordable options" },
           { value: "private", label: "Private Schools", desc: "Privately-run with more variety" },
           { value: "any", label: "Both Types", desc: "I'm open to all options" }].map(({ value, label, desc }) => (
             <label
               key={value}
-              className={`flex items-start gap-4 p-5 rounded-xl border transition cursor-pointer text-lg
+              className={`flex items-start gap-3 p-4 rounded-lg border transition cursor-pointer text-base
                 ${schoolType === value
                   ? "border-4 border-blue-400 bg-blue-500/20"
                   : "border-2 border-white/20 hover:border-blue-300"}`}
@@ -266,11 +295,11 @@ function UniFinder() {
                     setLocations(prev => prev.filter(loc => ["Angeles", "San Fernando"].includes(loc)))
                   }
                 }}
-                className="w-6 h-6 opacity-0 cursor-pointer"
+                className="w-5 h-5 opacity-0 cursor-pointer"
               />
               <div>
                 <span className="font-semibold font-poppins">{label}</span>
-                <p className="text-base text-blue-100 font-merriweather">{desc}</p>
+                <p className="text-sm text-blue-100 font-poppins">{desc}</p>
               </div>
             </label>
         ))}
@@ -278,20 +307,21 @@ function UniFinder() {
     </div>
 
     {schoolType === "private" && (
-      <div className="bg-blue-800/20 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-lg mt-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-blue-300/20 p-3 rounded-lg">
-            <DollarSign className="text-blue-300 w-7 h-7" />
+      <div className="bg-blue-800/20 backdrop-blur-md border border-white/20 
+                      rounded-xl p-6 shadow-lg max-w-3xl mx-auto mt-5">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-blue-300/20 p-2.5 rounded-lg">
+            <DollarSign className="text-blue-300 w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-3xl font-semibold font-poppins">Maximum Tuition</h2>
-            <p className="text-base text-blue-100 font-merriweather">
+            <h2 className="text-xl font-semibold font-inter">Maximum Tuition</h2>
+            <p className="text-sm text-blue-100 font-poppins">
               Set your budget per semester
             </p>
           </div>
         </div>
 
-        <label className="block text-blue-100 font-medium mb-3 font-merriweather text-lg">
+        <label className="block text-blue-100 font-medium mb-2 font-poppins text-base">
           Selected: ₱{maxBudget.toLocaleString()}
         </label>
 
@@ -305,7 +335,7 @@ function UniFinder() {
           className="w-full accent-blue-400"
         />
 
-        <div className="flex justify-between text-base text-blue-200 mt-2 font-merriweather">
+        <div className="flex justify-between text-sm text-blue-200 mt-2 font-poppins">
           <span>₱5,000</span>
           <span>₱50,000</span>
           <span>₱100,000</span>
@@ -313,30 +343,30 @@ function UniFinder() {
       </div>
     )}
 
-    <div className="flex justify-between pt-6">
-  <button
-    className="px-6 py-3 rounded-xl text-lg font-merriweather text-white 
-               border border-white/20 backdrop-blur-sm transition
-               hover:border-blue-300"
-    style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
-    onClick={() => setStep(1)}
-  >
-    Back
-  </button>
+    <div className="flex justify-between mt-5 pb-6 max-w-3xl mx-auto">
+      <button
+        className="px-6 py-2.5 rounded-lg text-base font-poppins text-white 
+                   border border-white/20 backdrop-blur-sm transition
+                   hover:border-blue-300"
+        style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+        onClick={() => setStep(1)}
+      >
+        Back
+      </button>
 
-  <button
-    className="px-8 py-4 rounded-xl text-lg font-poppins font-medium text-white 
-               border border-white/20 backdrop-blur-sm transition
-               hover:border-blue-300"
-    style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
-    onClick={() => setStep(3)}
-  >
-    Next
-  </button>
-</div>
-
+      <button
+        className="px-7 py-3 rounded-lg text-base font-poppins font-medium text-white 
+                   border border-white/20 backdrop-blur-sm transition
+                   hover:border-blue-300"
+        style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+        onClick={() => setStep(3)}
+      >
+        Next
+      </button>
+    </div>
   </>
 )}
+
 
 
           
@@ -349,10 +379,11 @@ function UniFinder() {
           <MapPin className="text-blue-300 w-7 h-7" />
         </div>
         <div>
-          <h2 className="text-3xl font-semibold font-poppins">Preferred Locations</h2>
-          <p className="text-base text-blue-100 font-merriweather">
-            Choose cities in Pampanga where you'd like to study
-          </p>
+          <h2 className="text-3xl font-semibold font-inter">Preferred Locations</h2>
+<p className="text-base text-blue-100 font-inter">
+  Choose cities in Pampanga where you'd like to study
+</p>
+
         </div>
       </div>
 
@@ -369,7 +400,7 @@ function UniFinder() {
                 );
               }}
               className={`
-                px-6 py-3 rounded-full text-lg font-medium font-merriweather cursor-pointer transition
+                px-6 py-3 rounded-full text-lg font-medium font-poppins cursor-pointer transition
                 ${isSelected
                   ? "border-4 border-white"
                   : "border-2 border-blue-400 opacity-80 hover:opacity-100"}
@@ -384,9 +415,9 @@ function UniFinder() {
       </div>
     </div>
 
-    <div className="flex justify-between pt-6">
+    <div className="flex justify-between mt-6 mb-12">
   <button
-    className="px-6 py-3 rounded-xl text-lg font-merriweather text-white 
+    className="px-6 py-3 rounded-xl text-lg font-poppins text-white 
                border border-white/20 backdrop-blur-sm transition
                hover:border-blue-300"
     style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
@@ -404,14 +435,15 @@ function UniFinder() {
   >
     <Search className="inline-block w-6 h-6 mr-2" />
     Find Programs
-      </button>
-    </div>
+  </button>
+</div>
+
   </>
 )}
 
         </div>
       </div>
-      <Footer />
+      
     </>
   )
 }

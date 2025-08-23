@@ -262,150 +262,219 @@ if (
 
                 </div>
 
-                {/* Description */}
-                <p className="text-sm leading-relaxed">{item.description}</p>
-                <p className="text-xs text-right mt-2">Score: {item.score}</p>
+                
 
                 {/* Expanded Section */}
-                {isExpanded && (
-                  <div className="mt-5 space-y-1.5 text-base animate-fade-in text-white" onClick={(e) => e.stopPropagation()}>
-                    <p className="flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-blue-600" />
-                      <strong>Type:</strong> {item.school_type || "N/A"}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-red-500" />
-                      <strong>Location:</strong> {item.location || "N/A"}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-green-600" />
-                      <strong>Tuition/Sem:</strong>{" "}
-                      {item.tuition_per_semester ||
-                        "Enjoy free tuition under this government-supported academic program."}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-green-600" />
-                      <strong>Tuition/Year:</strong>{" "}
-                      {item.tuition_annual ||
-                        "Enjoy free tuition under this government-supported academic program."}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <GraduationCap className="w-4 h-4 text-purple-600" />
-                      <strong>Board Passing Rate:</strong> {item.board_passing_rate || "N/A"}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-blue-600" />
-                      <strong>Category:</strong> {item.category || "N/A"}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-yellow-500" />
-                      <strong>Tuition Notes:</strong> {item.tuition_notes || "N/A"}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-yellow-600" />
-                      <strong>Admission Requirements:</strong> {item.admission_requirements || "N/A"}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-indigo-500" />
-                      <strong>Grade Requirements:</strong> {item.grade_requirements || "N/A"}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <ListChecks className="w-4 h-4 text-teal-600" />
-                      <strong>School Requirements:</strong> {item.school_requirements || "N/A"}
-                    </p>
-                    {item.school_website && (
-                      <p className="flex items-center gap-2">
-                        <LinkIcon className="w-4 h-4 text-blue-500" />
-                        <strong>Website:</strong>{" "}
-                        <a
-                          href={item.school_website}
-                          className="underline text-white"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Visit Site
-                        </a>
-                      </p>
-                    )}
+                {/* Expanded Section */}
+{isExpanded && (
+  <div
+    className="mt-5 text-base animate-fade-in text-white"
+    onClick={(e) => e.stopPropagation()}
+  >
+    {/* Description */}
+    <p className="text-sm leading-relaxed">{item.description}</p>
+    <p className="text-xs text-right mt-2 italic opacity-80">
+      ⭐ Score: {item.score}
+    </p>
 
-                    {mapsQuery && (
-                      <div className="mt-4 space-y-4">
-                        {/* School Map */}
-                        <iframe
-                          src={`https://www.google.com/maps?q=${encodeURIComponent(mapsQuery)}&output=embed`}
-                          width="100%"
-                          height="300"
-                          className="rounded-xl border"
-                          loading="lazy"
-                          allowFullScreen
-                        ></iframe>
+   {/* Info Grid */}
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
+  {/* Location */}
+  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+    <MapPin className="w-6 h-6 text-red-400" />
+    <div>
+      <p className="text-xs uppercase tracking-wide opacity-70">Location</p>
+      <p className="font-semibold">{item.location || "N/A"}</p>
+    </div>
+  </div>
 
-                        {/* Location + Distance */}
-                        <div className="flex flex-col gap-2">
-                          <div className="text-sm text-white">
-                            <span className="font-semibold">Your Detected Location:</span>{" "}
-                            {userCity || (userLocation.lat && userLocation.lng ? `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}` : "Not detected")}
-                          </div>
-                          {distanceText ? (
-                            <div className="flex items-center gap-3 bg-blue-800/20 backdrop-blur-md p-3 rounded-lg border border-white shadow-sm">
-                              <Ruler className="w-5 h-5 text-blue-300" />
-                              <span className="text-sm font-medium text-white">{distanceText}</span>
-                            </div>
-                          ) : (
-                            <div className="text-sm italic text-white">
-                              📍 Distance not available. Enable or pin your location to see distance.
-                            </div>
-                          )}
-                        </div>
+  {/* Grade Requirements */}
+  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+    <BookOpen className="w-6 h-6 text-indigo-400" />
+    <div>
+      <p className="text-xs uppercase tracking-wide opacity-70">Grade Req.</p>
+      <p className="font-semibold">{item.grade_requirements || "N/A"}</p>
+    </div>
+  </div>
 
-                        {/* Toggle Pin Map */}
-                        <button
-  className={`!px-3.5 !py-2 !rounded-full !backdrop-blur-md border-2 !border-white/40 text-xs font-Poppins font-medium !shadow-md transition duration-300 ease-in-out
+  {/* School Type */}
+  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+    <Building2 className="w-6 h-6 text-blue-400" />
+    <div>
+      <p className="text-xs uppercase tracking-wide opacity-70">School Type</p>
+      <p className="font-semibold">{item.school_type || "N/A"}</p>
+    </div>
+  </div>
+
+  {/* Admission Requirements */}
+  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+    <FileText className="w-6 h-6 text-yellow-500" />
+    <div>
+      <p className="text-xs uppercase tracking-wide opacity-70">Admission Req.</p>
+      <p className="font-semibold">{item.admission_requirements || "N/A"}</p>
+    </div>
+  </div>
+
+  {/* Tuition / Sem */}
+  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+    <DollarSign className="w-6 h-6 text-green-400" />
+    <div>
+      <p className="text-xs uppercase tracking-wide opacity-70">Tuition / Sem</p>
+      <p className="font-semibold">
+        {item.tuition_per_semester || "Free under gov’t-supported program"}
+      </p>
+    </div>
+  </div>
+
+  {/* School Requirements */}
+  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+    <ListChecks className="w-6 h-6 text-teal-400" />
+    <div>
+      <p className="text-xs uppercase tracking-wide opacity-70">School Req.</p>
+      <p className="font-semibold">{item.school_requirements || "N/A"}</p>
+    </div>
+  </div>
+
+  {/* Tuition / Year */}
+  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+    <DollarSign className="w-6 h-6 text-green-300" />
+    <div>
+      <p className="text-xs uppercase tracking-wide opacity-70">Tuition / Year</p>
+      <p className="font-semibold">
+        {item.tuition_annual || "Free under gov’t-supported program"}
+      </p>
+    </div>
+  </div>
+
+  {/* Board Passing Rate */}
+  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+    <GraduationCap className="w-6 h-6 text-purple-400" />
+    <div>
+      <p className="text-xs uppercase tracking-wide opacity-70">Board Passing</p>
+      <p className="font-semibold">{item.board_passing_rate || "N/A"}</p>
+    </div>
+  </div>
+
+  {/* Tuition Notes */}
+  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+    <DollarSign className="w-6 h-6 text-yellow-400" />
+    <div>
+      <p className="text-xs uppercase tracking-wide opacity-70">Tuition Notes</p>
+      <p className="font-semibold">{item.tuition_notes || "N/A"}</p>
+    </div>
+  </div>
+
+  {/* Website */}
+  {item.school_website && (
+    <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+      <LinkIcon className="w-6 h-6 text-blue-500" />
+      <div>
+        <p className="text-xs uppercase tracking-wide opacity-70">Website</p>
+        <a
+  href={item.school_website}
+  className="font-extrabold underline text-[crimson] hover:text-[darkred]"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  Visit SiteS
+</a>
+
+
+
+
+      </div>
+    </div>
+  )}
+</div>
+
+
+
+    {/* Map + Distance Section */}
+    {mapsQuery && (
+      <div className="mt-6 space-y-4">
+        {/* School Map */}
+        <iframe
+          src={`https://www.google.com/maps?q=${encodeURIComponent(
+            mapsQuery
+          )}&output=embed`}
+          width="100%"
+          height="300"
+          className="rounded-xl border"
+          loading="lazy"
+          allowFullScreen
+        ></iframe>
+
+        {/* Location + Distance */}
+        <div className="flex flex-col gap-2">
+          <div className="text-sm text-white">
+            <span className="font-semibold">Your Detected Location:</span>{" "}
+            {userCity ||
+              (userLocation.lat && userLocation.lng
+                ? `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`
+                : "Not detected")}
+          </div>
+          {distanceText ? (
+            <div className="flex items-center gap-3 bg-white/10 p-3 rounded-lg border border-white/20 shadow-sm backdrop-blur-md">
+              <Ruler className="w-5 h-5 text-blue-300" />
+              <span className="text-sm font-medium text-white">
+                {distanceText}
+              </span>
+            </div>
+          ) : (
+            <div className="text-sm italic text-white">
+              📍 Distance not available. Enable or pin your location to see distance.
+            </div>
+          )}
+        </div>
+
+        {/* Toggle Pin Map */}
+        <button
+          className={`!px-3.5 !py-2 !rounded-full !backdrop-blur-md border-2 !border-white/40 text-xs font-Poppins font-medium !shadow-md transition duration-300 ease-in-out
     ${
       showPinMap
         ? "!bg-red-600/40 hover:!bg-red-600/60 !text-white"
         : "!bg-blue-800/20 hover:!bg-blue-800/30 !text-white"
     }`}
-  style={{ WebkitBackdropFilter: "blur(10px)", backdropFilter: "blur(10px)" }}
-  onClick={(e) => {
-    e.stopPropagation();
-    setShowPinMap((prev) => !prev);
-  }}
->
-  {showPinMap ? "Hide Pin Map" : "Location not accurate? Pin manually"}
-</button>
+          style={{ WebkitBackdropFilter: "blur(10px)", backdropFilter: "blur(10px)" }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowPinMap((prev) => !prev);
+          }}
+        >
+          {showPinMap ? "Hide Pin Map" : "Location not accurate? Pin manually"}
+        </button>
 
+        {/* Pinning Map */}
+        {showPinMap && (
+          <div className="mt-2">
+            <MapContainer
+              center={[
+                pinnedLocation?.lat || userLocation.lat || 15.0305,
+                pinnedLocation?.lng || userLocation.lng || 120.6845,
+              ]}
+              zoom={12}
+              style={{ height: "300px", width: "100%", borderRadius: "12px" }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="© OpenStreetMap contributors"
+              />
+              <LocationMarker setPinnedLocation={setPinnedLocation} />
+            </MapContainer>
 
+            {pinnedLocation && (
+              <div className="mt-3 text-sm text-white">
+                📌 Pinned at {pinnedLocation.lat.toFixed(5)},{" "}
+                {pinnedLocation.lng.toFixed(5)}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+)}
 
-                        {/* Pinning Map (only visible when toggled) */}
-                        {showPinMap && (
-                          <div className="mt-2">
-                            <MapContainer
-                              center={[
-                                pinnedLocation?.lat || userLocation.lat || 15.0305,
-                                pinnedLocation?.lng || userLocation.lng || 120.6845
-                              ]}
-                              zoom={12}
-                              style={{ height: "300px", width: "100%", borderRadius: "12px" }}
-                            >
-                              <TileLayer
-                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                attribution="© OpenStreetMap contributors"
-                              />
-                              <LocationMarker setPinnedLocation={setPinnedLocation} />
-                            </MapContainer>
-
-                            {pinnedLocation && (
-                              <div className="mt-3 text-sm text-white">
-                                📌 Pinned at {pinnedLocation.lat.toFixed(5)}, {pinnedLocation.lng.toFixed(5)}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             );
           })}
