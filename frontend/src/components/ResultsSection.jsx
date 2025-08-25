@@ -4,13 +4,13 @@ import { useState, useEffect } from "react";
 import {
   GraduationCap,
   MapPin,
-  DollarSign,
   FileText,
   BookOpen,
   ListChecks,
   Link as LinkIcon,
   Building2,
-  Ruler
+  Ruler,
+  AlertCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -63,6 +63,7 @@ function ResultsSection({ results, message }) {
   const [pinnedLocation, setPinnedLocation] = useState(null);
   const [showPinMap, setShowPinMap] = useState(false); // toggled per active card
   const navigate = useNavigate();
+  
 
   // Reset the pin map toggle when switching expanded cards
   useEffect(() => {
@@ -216,14 +217,18 @@ if (
   distanceText = `Approx. ${distance.toFixed(2)} km from your detected/pinned location to ${item.school}`;
 }
 
+const PesoIcon = () => (
+  <span className="text-green-400 font-bold text-xl">₱</span>
+)
+
 
 
             return (
               <div
                 key={index}
-                className={`rounded-2xl bg-blue-800/20 backdrop-blur-md border border-white shadow-md transition-all duration-300 cursor-pointer hover:shadow-xl hover:scale-[1.015] p-6 w-[95%] md:w-[90%] lg:w-[85%] mx-auto ${
-                  isExpanded ? "bg-blue-800/40" : ""
-                }`}
+                className={`rounded-2xl bg-blue-800/20 backdrop-blur-md border border-white shadow-md transition-all duration-300 cursor-pointer hover:shadow-xl p-6 w-[95%] md:w-[90%] lg:w-[85%] mx-auto ${
+    isExpanded ? "bg-blue-800/40" : ""
+  }`}
                 onClick={() => setExpandedIndex(isExpanded ? null : index)}
               >
                 {/* Card Header */}
@@ -264,7 +269,7 @@ if (
 
                 
 
-                {/* Expanded Section */}
+                
                 {/* Expanded Section */}
 {isExpanded && (
   <div
@@ -316,15 +321,15 @@ if (
   </div>
 
   {/* Tuition / Sem */}
-  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
-    <DollarSign className="w-6 h-6 text-green-400" />
-    <div>
-      <p className="text-xs uppercase tracking-wide opacity-70">Tuition / Sem</p>
-      <p className="font-semibold">
-        {item.tuition_per_semester || "Free under gov’t-supported program"}
-      </p>
-    </div>
+<div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+  <PesoIcon />
+  <div>
+    <p className="text-xs uppercase tracking-wide opacity-70">Tuition / Sem</p>
+    <p className="font-semibold">
+      {item.tuition_per_semester || "Free under gov’t-supported program"}
+    </p>
   </div>
+</div>
 
   {/* School Requirements */}
   <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
@@ -336,33 +341,34 @@ if (
   </div>
 
   {/* Tuition / Year */}
-  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
-    <DollarSign className="w-6 h-6 text-green-300" />
-    <div>
-      <p className="text-xs uppercase tracking-wide opacity-70">Tuition / Year</p>
-      <p className="font-semibold">
-        {item.tuition_annual || "Free under gov’t-supported program"}
-      </p>
-    </div>
+<div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+  <PesoIcon />
+  <div>
+    <p className="text-xs uppercase tracking-wide opacity-70">Tuition / Year</p>
+    <p className="font-semibold">
+      {item.tuition_annual || "Free under gov’t-supported program"}
+    </p>
   </div>
+</div>
 
   {/* Board Passing Rate */}
   <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
     <GraduationCap className="w-6 h-6 text-purple-400" />
     <div>
-      <p className="text-xs uppercase tracking-wide opacity-70">Board Passing</p>
+      <p className="text-xs uppercase tracking-wide opacity-70">Board Passing Rate</p>
       <p className="font-semibold">{item.board_passing_rate || "N/A"}</p>
     </div>
   </div>
 
   {/* Tuition Notes */}
-  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
-    <DollarSign className="w-6 h-6 text-yellow-400" />
-    <div>
-      <p className="text-xs uppercase tracking-wide opacity-70">Tuition Notes</p>
-      <p className="font-semibold">{item.tuition_notes || "N/A"}</p>
-    </div>
+<div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+  <AlertCircle className="w-8 h-8 text-yellow-400" />  {/* enlarged icon */}
+  <div>
+    <p className="text-xs uppercase tracking-wide opacity-70">Tuition Notes</p>
+    <p className="font-semibold">{item.tuition_notes || "N/A"}</p>
   </div>
+</div>
+
 
   {/* Website */}
   {item.school_website && (
@@ -376,18 +382,13 @@ if (
   target="_blank"
   rel="noopener noreferrer"
 >
-  Visit SiteS
+  Visit Site
 </a>
-
-
-
 
       </div>
     </div>
   )}
 </div>
-
-
 
     {/* Map + Distance Section */}
     {mapsQuery && (
@@ -405,27 +406,28 @@ if (
         ></iframe>
 
         {/* Location + Distance */}
-        <div className="flex flex-col gap-2">
-          <div className="text-sm text-white">
-            <span className="font-semibold">Your Detected Location:</span>{" "}
-            {userCity ||
-              (userLocation.lat && userLocation.lng
-                ? `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`
-                : "Not detected")}
-          </div>
-          {distanceText ? (
-            <div className="flex items-center gap-3 bg-white/10 p-3 rounded-lg border border-white/20 shadow-sm backdrop-blur-md">
-              <Ruler className="w-5 h-5 text-blue-300" />
-              <span className="text-sm font-medium text-white">
-                {distanceText}
-              </span>
-            </div>
-          ) : (
-            <div className="text-sm italic text-white">
-              📍 Distance not available. Enable or pin your location to see distance.
-            </div>
-          )}
-        </div>
+<div className="flex flex-col gap-2">
+  <div className="text-sm text-white">
+    <span className="font-semibold">Your Detected Location:</span>{" "}
+    {userCity ||
+      (userLocation.lat && userLocation.lng
+        ? `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`
+        : "Not detected")}
+  </div>
+  {distanceText ? (
+    <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+      <Ruler className="w-8 h-8 text-blue-300" /> {/* enlarged icon */}
+      <div>
+        <p className="text-xs uppercase tracking-wide opacity-70">Distance</p>
+        <p className="font-semibold text-white">{distanceText}</p>
+      </div>
+    </div>
+  ) : (
+    <div className="text-sm italic text-white">
+      📍 Distance not available. Enable or pin your location to see distance.
+    </div>
+  )}
+</div>
 
         {/* Toggle Pin Map */}
         <button

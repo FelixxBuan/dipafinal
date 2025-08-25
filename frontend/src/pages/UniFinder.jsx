@@ -6,6 +6,8 @@ import Navbar from "../components/navbar"
 function UniFinder() {
   const [step, setStep] = useState(1)
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false);
+
 
   const [answers, setAnswers] = useState({
     academics: [],
@@ -61,21 +63,30 @@ function UniFinder() {
   ];
 
   const search = async () => {
-    const payload = { answers, school_type: schoolType, locations }
-    if (schoolType === "private") payload.max_budget = maxBudget
+  setLoading(true);
+  const payload = { answers, school_type: schoolType, locations }
+  if (schoolType === "private") payload.max_budget = maxBudget
 
+  try {
     const response = await fetch("http://127.0.0.1:8000/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
-    })
+    });
 
-    const data = await response.json()
-    localStorage.setItem("results", JSON.stringify(data.results || []))
-    localStorage.setItem("message", data.message || "")
-    localStorage.setItem("type", data.type || "exact")
-    navigate("/results")
+    const data = await response.json();
+    localStorage.setItem("results", JSON.stringify(data.results || []));
+    localStorage.setItem("message", data.message || "");
+    localStorage.setItem("type", data.type || "exact");
+
+    navigate("/results");
+  } catch (error) {
+    console.error("Error fetching results:", error);
+  } finally {
+    setLoading(false);
   }
+};
+
 
 const ProgressBar = () => {
   const steps = [
@@ -440,6 +451,14 @@ const ProgressBar = () => {
 
   </>
 )}
+
+{loading && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
+    <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-400"></div>
+    <p className="ml-4 text-white text-xl font-poppins">Finding programs...</p>
+  </div>
+)}
+
 
         </div>
       </div>
