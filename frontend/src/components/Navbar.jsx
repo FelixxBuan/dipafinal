@@ -4,14 +4,20 @@ import { Link } from "react-router-dom";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const mediumNavy = "#1A3A6D"; // softer navy blue
-  const hoverNavy = "#0D2B5B"; // darker hover color
+  const mediumNavy = "#1A3A6D"; // dark navy blue
+  const hoverNavy = "#0D2B5B"; // darker shade for hover
 
   return (
     <nav
-      className="fixed top-0 left-0 w-full z-50 bg-white backdrop-blur-sm border-b border-gray-200 shadow-sm"
-      style={{ fontFamily: "Poppins, sans-serif" }}
-    >
+  className="fixed top-0 left-0 w-full z-50 backdrop-blur-md"
+  style={{
+    fontFamily: "Poppins, sans-serif",
+    background: "rgba(255, 255, 255, 0.95)",
+    boxShadow: "0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.5)",
+    borderBottom: "1px solid rgba(255,255,255,0.3)",
+  }}
+>
+
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}

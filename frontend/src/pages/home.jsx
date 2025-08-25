@@ -4,7 +4,6 @@ import Navbar from "../components/navbar";
 import Footer from "../components/Footer";
 import ShowcaseCarousel from "../components/ShowcaseCarousel";
 
-
 function Home() {
   const navigate = useNavigate();
 
@@ -12,21 +11,26 @@ function Home() {
     <>
       <Navbar />
 
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="min-h-screen bg-gradient-to-b from-blue-900 via-blue-950 to-black text-white font-Poppins">
         {/* Hero Section */}
-        <section className="container mx-auto px-4 py-20 text-center">
+        <section className="container mx-auto px-6 py-24 text-center">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-5xl md:text-6xl font-Merriweather font-extrabold leading-tight mb-6">
               Find Your Perfect
-              <span className="text-blue-600 block">Educational Path</span>
+              <span className="text-blue-400 block drop-shadow-lg">
+                Educational Path
+              </span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Discover the ideal school and program that matches your interests, budget, and location preferences with our
-              intelligent recommendation system.
+            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto">
+              Discover the ideal school and program that matches your{" "}
+              <span className="text-teal-400">interests</span>,{" "}
+              <span className="text-green-400">budget</span>, and{" "}
+              <span className="text-purple-400">location preferences</span> with
+              our intelligent recommendation system.
             </p>
             <button
               onClick={() => navigate("/unifinder")}
-              className="text-lg px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition"
+              className="px-8 py-4 bg-blue-600/40 backdrop-blur-md border border-white/20 text-white text-lg font-semibold rounded-full hover:bg-blue-600/60 transition-all shadow-md"
             >
               Start Finding Programs
             </button>
@@ -34,47 +38,50 @@ function Home() {
         </section>
 
         {/* How It Works Section */}
-        <section className="py-20 bg-white">
+        <section className="py-20">
           <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">
+            <h2 className="text-4xl font-Merriweather font-bold text-center mb-16">
               How UniFinder Works
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
               {/* Step 1 */}
-              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:border-blue-400 transition duration-300">
+              <div className="bg-blue-800/20 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg p-8 hover:bg-blue-800/30 transition-all duration-300">
                 <div className="text-center">
-                  <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Users className="w-8 h-8 text-blue-600" />
+                  <div className="bg-blue-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Users className="w-8 h-8 text-blue-400" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-4 text-gray-900">1. Share Your Interests</h3>
-                  <p className="text-gray-600">
-                    Tell us about your passions, hobbies, and career interests to help us understand what you're looking for.
+                  <h3 className="text-xl font-semibold mb-4">1. Share Your Interests</h3>
+                  <p className="text-white/70">
+                    Tell us about your passions, hobbies, and career interests to
+                    help us understand what you’re looking for.
                   </p>
                 </div>
               </div>
 
               {/* Step 2 */}
-              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:border-green-400 transition duration-300">
+              <div className="bg-blue-800/20 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg p-8 hover:bg-blue-800/30 transition-all duration-300">
                 <div className="text-center">
-                  <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Search className="w-8 h-8 text-green-600" />
+                  <div className="bg-green-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Search className="w-8 h-8 text-green-400" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-4 text-gray-900">2. Set Your Preferences</h3>
-                  <p className="text-gray-600">
-                    Choose between public or private institutions, set your budget range, and select your preferred locations.
+                  <h3 className="text-xl font-semibold mb-4">2. Set Your Preferences</h3>
+                  <p className="text-white/70">
+                    Choose between public or private institutions, set your
+                    budget range, and select your preferred locations.
                   </p>
                 </div>
               </div>
 
               {/* Step 3 */}
-              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:border-purple-400 transition duration-300">
+              <div className="bg-blue-800/20 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg p-8 hover:bg-blue-800/30 transition-all duration-300">
                 <div className="text-center">
-                  <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <GraduationCap className="w-8 h-8 text-purple-600" />
+                  <div className="bg-purple-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <GraduationCap className="w-8 h-8 text-purple-400" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-4 text-gray-900">3. Get Recommendations</h3>
-                  <p className="text-gray-600">
-                    Receive personalized program and school recommendations that match your criteria perfectly.
+                  <h3 className="text-xl font-semibold mb-4">3. Get Recommendations</h3>
+                  <p className="text-white/70">
+                    Receive personalized program and school recommendations that
+                    match your criteria perfectly.
                   </p>
                 </div>
               </div>
@@ -83,12 +90,14 @@ function Home() {
         </section>
 
         {/* Showcase Carousel Section */}
-        <ShowcaseCarousel />
+        <div className="py-20">
+          <ShowcaseCarousel />
+        </div>
 
         {/* FAQ Section */}
-        <section className="bg-white py-20">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
+        <section className="py-20 bg-blue-800/20 backdrop-blur-md border-t border-white/10">
+          <div className="container mx-auto px-6 max-w-4xl">
+            <h2 className="text-4xl font-Merriweather font-bold text-center mb-12">
               Frequently Asked Questions
             </h2>
 
@@ -101,7 +110,8 @@ function Home() {
                 },
                 {
                   question: "Is UniFinder free to use?",
-                  answer: "Yes! UniFinder is completely free for students to explore and use.",
+                  answer:
+                    "Yes! UniFinder is completely free for students to explore and use.",
                 },
                 {
                   question: "How accurate are the recommendations?",
@@ -116,22 +126,21 @@ function Home() {
               ].map((faq, index) => (
                 <details
                   key={index}
-                  className="group border border-gray-200 rounded-xl p-4 open:bg-blue-50 transition-all duration-200"
+                  className="group bg-blue-900/30 border border-white/20 rounded-2xl p-5 backdrop-blur-sm open:bg-blue-900/50 transition-all duration-300"
                 >
-                  <summary className="font-semibold text-lg cursor-pointer text-gray-800 group-open:text-blue-600 flex justify-between items-center">
+                  <summary className="font-semibold text-lg cursor-pointer flex justify-between items-center text-white group-open:text-blue-400">
                     {faq.question}
                     <span className="ml-2 transform transition-transform group-open:rotate-180">
                       ⌄
                     </span>
                   </summary>
-                  <p className="mt-2 text-gray-600">{faq.answer}</p>
+                  <p className="mt-3 text-white/70">{faq.answer}</p>
                 </details>
               ))}
             </div>
           </div>
         </section>
       </div>
-      
 
       <Footer />
     </>

@@ -111,3 +111,23 @@ button:focus-visible {
 .animate-fade-in {
   animation: fadeIn 0.3s ease-in-out;
 }
+
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background: linear-gradient(270deg, #1a3a6d, #0d2b5b, #1c6ea4);
+  background-size: 600% 600%;
+  animation: gradient 12s ease infinite;
+}
+

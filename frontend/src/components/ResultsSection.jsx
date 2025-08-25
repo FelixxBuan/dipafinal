@@ -11,8 +11,10 @@ import {
   Building2,
   Ruler,
   AlertCircle,
+  X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
 
 // Leaflet + React-Leaflet imports
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
@@ -429,49 +431,80 @@ const PesoIcon = () => (
   )}
 </div>
 
-        {/* Toggle Pin Map */}
+       {/* Toggle Pin Map Button */}
+<button
+  className="!px-3.5 !py-2 !rounded-full !bg-blue-800/20 hover:!bg-blue-800/30 !text-white !backdrop-blur-md border-2 !border-white/40 text-xs font-Poppins font-medium !shadow-md transition duration-300 ease-in-out"
+  onClick={(e) => {
+    e.stopPropagation();
+    setShowPinMap(true);
+  }}
+>
+  Location not accurate? Pin manually
+</button>
+
+{/* Modal for Pinning Map */}
+{showPinMap && (
+  <div
+    className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end justify-center z-50"
+    onClick={() => setShowPinMap(false)} // closes when clicking background
+  >
+    <div
+      className="bg-blue-800/30 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg w-full max-w-2xl p-5 relative mb-6 text-white"
+      onClick={(e) => e.stopPropagation()} // prevents closing when clicking inside modal
+    >
+      {/* Close Button */}
+      <button
+        className="absolute top-3 right-3 text-red-600 hover:text-red-800 transition duration-200 bg-transparent border-none outline-none shadow-none p-0 m-0"
+        style={{ background: "transparent" }}
+        onClick={() => setShowPinMap(false)}
+      >
+        <X size={20} strokeWidth={2.5} />
+      </button>
+
+      <h2 className="text-lg font-semibold mb-3">📍 Pin Your Location</h2>
+
+      {/* Map */}
+      <MapContainer
+        center={[
+          pinnedLocation?.lat || userLocation.lat || 15.0305,
+          pinnedLocation?.lng || userLocation.lng || 120.6845,
+        ]}
+        zoom={12}
+        style={{ height: "300px", width: "100%", borderRadius: "12px" }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="© OpenStreetMap contributors"
+        />
+        <LocationMarker setPinnedLocation={setPinnedLocation} />
+      </MapContainer>
+
+      {/* Pinned Location Text */}
+      {pinnedLocation && (
+        <div className="mt-3 text-sm opacity-90">
+          📌 Pinned at {pinnedLocation.lat.toFixed(5)},{" "}
+          {pinnedLocation.lng.toFixed(5)}
+        </div>
+      )}
+
+      {/* Save Button */}
+      <div className="text-right mt-5">
         <button
-          className={`!px-3.5 !py-2 !rounded-full !backdrop-blur-md border-2 !border-white/40 text-xs font-Poppins font-medium !shadow-md transition duration-300 ease-in-out
-    ${
-      showPinMap
-        ? "!bg-red-600/40 hover:!bg-red-600/60 !text-white"
-        : "!bg-blue-800/20 hover:!bg-blue-800/30 !text-white"
-    }`}
-          style={{ WebkitBackdropFilter: "blur(10px)", backdropFilter: "blur(10px)" }}
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowPinMap((prev) => !prev);
+          className="!px-4 !py-2 !rounded-full !bg-blue-800/20 hover:!bg-blue-800/30 !backdrop-blur-md !border !border-white/30 !text-white text-sm font-Poppins font-medium !shadow-md transition duration-300 ease-in-out"
+          style={{
+            WebkitBackdropFilter: "blur(10px)",
+            backdropFilter: "blur(10px)",
           }}
+          onClick={() => setShowPinMap(false)}
         >
-          {showPinMap ? "Hide Pin Map" : "Location not accurate? Pin manually"}
+          Okay
         </button>
+      </div>
+    </div>
+  </div>
+)}
 
-        {/* Pinning Map */}
-        {showPinMap && (
-          <div className="mt-2">
-            <MapContainer
-              center={[
-                pinnedLocation?.lat || userLocation.lat || 15.0305,
-                pinnedLocation?.lng || userLocation.lng || 120.6845,
-              ]}
-              zoom={12}
-              style={{ height: "300px", width: "100%", borderRadius: "12px" }}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="© OpenStreetMap contributors"
-              />
-              <LocationMarker setPinnedLocation={setPinnedLocation} />
-            </MapContainer>
-
-            {pinnedLocation && (
-              <div className="mt-3 text-sm text-white">
-                📌 Pinned at {pinnedLocation.lat.toFixed(5)},{" "}
-                {pinnedLocation.lng.toFixed(5)}
-              </div>
-            )}
-          </div>
-        )}
+ 
       </div>
     )}
   </div>
