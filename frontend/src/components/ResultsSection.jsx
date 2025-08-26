@@ -152,10 +152,13 @@ function ResultsSection({ results, message }) {
   return (
     <div className="font-Poppins">
       {/* Navbar at the top */}
-      <Navbar />
+      <Navbar sticky={false} />
 
       {/* Outer container */}
-      <div className="pt-[100px] pb-4 px-4 w-full max-w-7xl mx-auto text-white">
+      <div className="pt-12 pb-4 px-4 w-full max-w-7xl mx-auto text-white">
+
+
+
         {/* Title & Note */}
         <div className="flex flex-col items-center mb-8 text-center space-y-3">
           <h1 className="text-2xl md:text-3xl font-bold font-Merriweather text-white tracking-wide">

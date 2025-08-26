@@ -55,12 +55,33 @@ function UniFinder() {
   const filteredLocations = schoolType === "private" ? ["Angeles", "San Fernando"] : allLocations
 
   const questions = [
-    { key: "academics", title: "What subjects or academic areas do you enjoy the most?", choices: ["Math", "Science", "English", "History or Social Studies", "PE or Sports", "Arts or Design", "Technology or ICT", "Business or Economics", "Foreign Languages"] },
-    { key: "fields", title: "Which fields or careers are you most drawn to?", choices: ["Engineering & Architecture", "Arts & Media", "Healthcare & Medicine", "Education & Teaching", "Social Work", "Law & Government", "Science & Research", "Technology"] },
-    { key: "activities", title: "What kinds of tasks or activities do you enjoy doing?", choices: ["Designing", "Solving puzzles or problems", "Writing", "Building or fixing things", "Helping or mentoring others", "Researching or analyzing", "Speaking or presenting"] },
-    { key: "goals", title: "What goals matter most to you in a future career?", choices: ["Innovating", "Making a positive impact on people’s lives", "Educating","Business growth", "Promoting justice","Protecting the environment",] },
-    { key: "environment", title: "What environment or setting do you see yourself working in?", choices: ["Office", "Academic setting", "Hospitals", "Outdoor", "Workshop or laboratory", "Creative space", "Tech-driven", "Government institutions", "freelance setup"] }
-  ];
+  { 
+    key: "academics", 
+    title: "What subjects or academic areas do you enjoy the most?", 
+    choices: ["Math", "Science", "English", "History or Social Studies", "PE or Sports", "Arts or Design", "Technology or ICT"] 
+  },
+  { 
+    key: "fields", 
+    title: "Which fields or careers are you most drawn to?", 
+    choices: ["Engineering & Architecture", "Arts & Media", "Healthcare & Medicine", "Education & Teaching", "Social Work", "Law & Government", "Technology"] 
+  },
+  { 
+    key: "activities", 
+    title: "What kinds of tasks or activities do you enjoy doing?", 
+    choices: ["Designing", "Solving puzzles or problems", "Writing", "Building or fixing things", "Helping or mentoring others", "Researching or analyzing", "Speaking or presenting"] 
+  },
+  { 
+    key: "goals", 
+    title: "What goals matter most to you in a future career?", 
+    choices: ["Innovating", "Making a positive impact on people’s lives", "Educating", "Business growth", "Promoting justice", "Protecting the environment", "Gaining expertise"] 
+  },
+  { 
+    key: "environment", 
+    title: "What environment or setting do you see yourself working in?", 
+    choices: ["Office", "Academic setting", "Hospitals", "Outdoor", "Workshop or laboratory", "Creative space", "Tech-driven"] 
+  }
+];
+
 
   const search = async () => {
   setLoading(true);
@@ -88,73 +109,59 @@ function UniFinder() {
 };
 
 
+
+
 const ProgressBar = () => {
   const steps = [
-    { id: 1, label: "Questions", icon: <HelpCircle size={24} /> },
-    { id: 2, label: "School Type", icon: <School size={24} /> },
-    { id: 3, label: "Location", icon: <MapPin size={24} /> },
+    { id: 1, label: "Questions", icon: <HelpCircle size={24} className="text-red-400" /> },
+    { id: 2, label: "School Type", icon: <School size={24} className="text-green-400" /> },
+    { id: 3, label: "Location", icon: <MapPin size={24} className="text-yellow-400" /> },
   ];
 
-  // Progress calculation
   let progressPercent = 0;
 
   if (step === 1) {
-    // Only start moving after the 1st question
     if (currentQuestionIndex === 0) {
-      progressPercent = 0; // still at circle 1
+      progressPercent = 0;
     } else {
-      // 4 equal segments between circle 1 and circle 2
       progressPercent =
         (currentQuestionIndex / (questions.length - 1)) *
         (100 / (steps.length - 1));
     }
   } else if (step === 2) {
-    progressPercent = 100 / (steps.length - 1); // exactly at circle 2
+    progressPercent = 100 / (steps.length - 1);
   } else if (step === 3) {
-    progressPercent = 100; // full bar
+    progressPercent = 100;
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto mt-12 relative">
-      {/* Background Line */}
-      <div
-        className="absolute top-1/2 h-[6px] bg-blue-900 rounded-full transform -translate-y-1/2"
-        style={{ left: "4rem", right: "3rem" }}
-      ></div>
+    <div className="w-full max-w-3xl mx-auto mt-12">
+      <div className="relative flex items-center justify-between px-4">
+        {/* Background Line */}
+        <div className="absolute left-14 right-14 top-1/2 -translate-y-1/2 -mt-[8px] h-[6px] bg-blue-900 rounded-full" />
 
-      {/* Progress Line */}
-      <div
-        className="absolute top-1/2 h-[6px] rounded-full bg-blue-400 shadow-[0_0_20px_4px_rgba(59,130,246,0.8)] transform -translate-y-1/2 transition-all duration-500"
-        style={{
-          left: "4rem",
-          width: `calc((100% - 7rem) * ${progressPercent / 100})`,
-        }}
-      ></div>
+        {/* Progress Line */}
+        <div
+          className="absolute left-14 top-1/2 -translate-y-1/2 -mt-[8px] h-[6px] bg-blue-400 rounded-full shadow-[0_0_20px_4px_rgba(59,130,246,0.8)] transition-all duration-500"
+          style={{
+            width: `calc((100% - 7rem) * ${progressPercent / 100})`,
+          }}
+        />
 
-      {/* Circles */}
-      <div className="flex justify-between relative z-10 px-4">
+        {/* Circles */}
         {steps.map((s) => {
-          // Extra glow for Step 2 during question progress
           let extraGlow = "";
           if (s.id === 2 && step === 1 && currentQuestionIndex > 0) {
-            const progressToStep2 =
-              currentQuestionIndex / (questions.length - 1);
-            extraGlow = `shadow-[0_0_${10 + progressToStep2 * 20}px_${
-              2 + progressToStep2 * 4
-            }px_rgba(59,130,246,${0.3 + progressToStep2 * 0.5})]`;
+            const progressToStep2 = currentQuestionIndex / (questions.length - 1);
+            extraGlow = `shadow-[0_0_${10 + progressToStep2 * 20}px_${2 + progressToStep2 * 4}px_rgba(59,130,246,${0.3 + progressToStep2 * 0.5})]`;
           }
 
           return (
-            <div key={s.id} className="flex flex-col items-center">
+            <div key={s.id} className="flex flex-col items-center relative z-10">
               <div
                 className={`w-14 h-14 flex items-center justify-center rounded-full border-2 transition-all duration-500
-                  ${
-                    s.id === step
-                      ? "bg-blue-900 text-white border-blue-400"
-                      : s.id < step
-                      ? "bg-blue-900 text-white border-blue-400"
-                      : "bg-blue-900 text-gray-400 border-blue-900/50"
-                  } ${extraGlow}`}
+                  bg-blue-800/20 backdrop-blur-md
+                  ${s.id === step || s.id < step ? "border-blue-400" : "border-white/20"} ${extraGlow}`}
               >
                 {s.icon}
               </div>
@@ -168,10 +175,12 @@ const ProgressBar = () => {
 };
 
 
+
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-[#020617] to-[#0a0f1f] pt-24 px-4 text-white">
+      <div className="min-h-screen bg-gradient-to-br from-[#020617] to-[#0a0f1f] pt-32 px-4 text-white">
+
 
 
         <div className="max-w-5xl mx-auto space-y-8">
@@ -455,7 +464,7 @@ const ProgressBar = () => {
 {loading && (
   <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
     <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-400"></div>
-    <p className="ml-4 text-white text-xl font-poppins">Finding programs...</p>
+    
   </div>
 )}
 
