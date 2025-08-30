@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Heart, MapPin, DollarSign, School, Search, HelpCircle } from "lucide-react"
-import Navbar from "../components/navbar"
+import Navbar from "../components/Navbar"
 
 function UniFinder() {
   const [step, setStep] = useState(1)
@@ -187,21 +187,28 @@ const ProgressBar = () => {
 
           <ProgressBar />
 
-          {/* Step 1 */}
-         {step === 1 && (
+         {/* Step 1 */}
+{step === 1 && (
   <>
     {(() => {
       const q = questions[currentQuestionIndex]
       return (
-        <div className="bg-blue-800/20 backdrop-blur-md p-10 rounded-3xl border border-white/20 shadow-lg space-y-8">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-300/20 p-3 rounded-md">
-              <Heart className="text-blue-300 w-7 h-7" />
+        <div className="bg-blue-800/20 backdrop-blur-md 
+                        p-6 sm:p-8 md:p-10 
+                        rounded-2xl sm:rounded-3xl 
+                        border border-white/20 shadow-lg space-y-6 sm:space-y-8">
+          {/* Title */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="bg-blue-300/20 p-2 sm:p-3 rounded-md">
+              <Heart className="text-blue-300 w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
             </div>
-          <h2 className="text-2xl font-semibold font-inter">{q.title}</h2>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold font-inter">
+              {q.title}
+            </h2>
           </div>
 
-          <div className="flex flex-wrap gap-4">
+          {/* Choices */}
+          <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
             {q.choices.map((choice) => {
               const isSelected = answers[q.key].includes(choice);
               return (
@@ -209,10 +216,12 @@ const ProgressBar = () => {
                   key={choice}
                   onClick={() => handleCheckboxChange(q.key, choice)}
                   className={`
-                    px-4 py-2 rounded-full text-lg font-medium cursor-pointer transition
+                    px-3 py-1.5 sm:px-4 sm:py-2 
+                    rounded-full text-sm sm:text-base md:text-lg 
+                    font-medium cursor-pointer transition
                     ${isSelected 
-                      ? "border-4 border-white" 
-                      : "border-2 border-blue-400 opacity-80 hover:opacity-100"} 
+                      ? "border-2 sm:border-4 border-white" 
+                      : "border border-blue-400 opacity-80 hover:opacity-100"} 
                     bg-white/10 backdrop-blur-sm
                     text-white font-poppins
                   `}
@@ -221,59 +230,75 @@ const ProgressBar = () => {
                 </div>
               );
             })}
-</div>
-                    <input
-                      type="text"
-                      placeholder="Other (optional)..."
-                      className="mt-2 w-full border border-white/20 bg-white/10 rounded-lg px-4 py-2 text-sm placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      value={answers.custom[q.key]}
-                      onChange={(e) => handleCustomChange(q.key, e.target.value)}
-                    />
-                  </div>
-                )
-              })()}
-              <div className="flex justify-between mt-4">
-  {currentQuestionIndex > 0 ? (
-    <button
-      className="px-6 py-3 rounded-xl text-lg font-poppins text-white 
-                 border border-white/20 backdrop-blur-sm transition
-                 hover:border-blue-300"
-      style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
-      onClick={() => setCurrentQuestionIndex(currentQuestionIndex - 1)}
-    >
-      Back
-    </button>
-  ) : <span></span>}
+          </div>
 
-  {currentQuestionIndex < questions.length - 1 ? (
-    <button
-      className="px-6 py-3 rounded-xl text-lg font-poppins font-medium text-white 
-                 border border-white/20 backdrop-blur-sm transition
-                 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
-      style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
-      disabled={
-        answers[questions[currentQuestionIndex].key].length === 0 &&
-        answers.custom[questions[currentQuestionIndex].key].trim() === ""
-      }
-      onClick={() => setCurrentQuestionIndex(currentQuestionIndex + 1)}
-    >
-      Next
-    </button>
-  ) : (
-    <button
-      className="px-6 py-3 rounded-xl text-lg font-poppins font-medium text-white 
-                 border border-white/20 backdrop-blur-sm transition
-                 hover:border-blue-300"
-      style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
-      onClick={() => setStep(2)}
-    >
-      Continue
-    </button>
-  )}
-</div>
-              
-            </>
-          )}
+          {/* Custom Input */}
+          <input
+            type="text"
+            placeholder="Other (optional)..."
+            className="mt-2 w-full border border-white/20 bg-white/10 
+                       rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 
+                       text-xs sm:text-sm md:text-base 
+                       placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={answers.custom[q.key]}
+            onChange={(e) => handleCustomChange(q.key, e.target.value)}
+          />
+        </div>
+      )
+    })()}
+
+    {/* Buttons */}
+    <div className="flex justify-between mt-4">
+      {currentQuestionIndex > 0 ? (
+        <button
+          className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 
+                     rounded-lg sm:rounded-xl 
+                     text-sm sm:text-base md:text-lg 
+                     font-poppins text-white 
+                     border border-white/20 backdrop-blur-sm transition
+                     hover:border-blue-300"
+          style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+          onClick={() => setCurrentQuestionIndex(currentQuestionIndex - 1)}
+        >
+          Back
+        </button>
+      ) : <span></span>}
+
+      {currentQuestionIndex < questions.length - 1 ? (
+        <button
+          className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 
+                     rounded-lg sm:rounded-xl 
+                     text-sm sm:text-base md:text-lg 
+                     font-poppins font-medium text-white 
+                     border border-white/20 backdrop-blur-sm transition
+                     hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+          disabled={
+            answers[questions[currentQuestionIndex].key].length === 0 &&
+            answers.custom[questions[currentQuestionIndex].key].trim() === ""
+          }
+          onClick={() => setCurrentQuestionIndex(currentQuestionIndex + 1)}
+        >
+          Next
+        </button>
+      ) : (
+        <button
+          className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 
+                     rounded-lg sm:rounded-xl 
+                     text-sm sm:text-base md:text-lg 
+                     font-poppins font-medium text-white 
+                     border border-white/20 backdrop-blur-sm transition
+                     hover:border-blue-300"
+          style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+          onClick={() => setStep(2)}
+        >
+          Continue
+        </button>
+      )}
+    </div>
+  </>
+)}
+
 
           {/* Step 2 */}
           {step === 2 && (
@@ -389,26 +414,29 @@ const ProgressBar = () => {
 
 
 
-          
-          {/* Step 3 */}
+{/* Step 3 */}
 {step === 3 && (
   <>
-    <div className="bg-blue-800/20 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg p-8">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="bg-blue-300/20 p-3 rounded-lg">
-          <MapPin className="text-blue-300 w-7 h-7" />
+    <div className="bg-blue-800/20 backdrop-blur-md border border-white/20 
+                    rounded-xl sm:rounded-2xl shadow-lg 
+                    p-6 sm:p-8 md:p-10">
+      {/* Title */}
+      <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+        <div className="bg-blue-300/20 p-2 sm:p-3 rounded-lg">
+          <MapPin className="text-blue-300 w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
         </div>
         <div>
-          <h2 className="text-3xl font-semibold font-inter">Preferred Locations</h2>
-<p className="text-base text-blue-100 font-inter">
-  Choose cities in Pampanga where you'd like to study
-</p>
-
+          <h2 className="text-lg sm:text-2xl md:text-3xl font-semibold font-inter">
+            Preferred Locations
+          </h2>
+          <p className="text-xs sm:text-sm md:text-base text-blue-100 font-inter">
+            Choose cities in Pampanga where you'd like to study
+          </p>
         </div>
       </div>
 
-      {/* Pill-shaped multi-select like Step 1 */}
-      <div className="flex flex-wrap gap-4">
+      {/* Location pills */}
+      <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
         {filteredLocations.map((loc) => {
           const isSelected = locations.includes(loc);
           return (
@@ -420,10 +448,13 @@ const ProgressBar = () => {
                 );
               }}
               className={`
-                px-6 py-3 rounded-full text-lg font-medium font-poppins cursor-pointer transition
+                px-3 py-1.5 sm:px-5 sm:py-2 md:px-6 md:py-3
+                rounded-full 
+                text-sm sm:text-base md:text-lg 
+                font-medium font-poppins cursor-pointer transition
                 ${isSelected
-                  ? "border-4 border-white"
-                  : "border-2 border-blue-400 opacity-80 hover:opacity-100"}
+                  ? "border-2 sm:border-4 border-white"
+                  : "border border-blue-400 opacity-80 hover:opacity-100"}
                 bg-white/10 backdrop-blur-sm
                 text-white
               `}
@@ -435,31 +466,38 @@ const ProgressBar = () => {
       </div>
     </div>
 
-    <div className="flex justify-between mt-6 mb-12">
-  <button
-    className="px-6 py-3 rounded-xl text-lg font-poppins text-white 
-               border border-white/20 backdrop-blur-sm transition
-               hover:border-blue-300"
-    style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
-    onClick={() => setStep(2)}
-  >
-    Back
-  </button>
+    {/* Buttons */}
+    <div className="flex justify-between mt-4 sm:mt-6 mb-10 sm:mb-12">
+      <button
+        className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 
+                   rounded-lg sm:rounded-xl 
+                   text-sm sm:text-base md:text-lg 
+                   font-poppins text-white 
+                   border border-white/20 backdrop-blur-sm transition
+                   hover:border-blue-300"
+        style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+        onClick={() => setStep(2)}
+      >
+        Back
+      </button>
 
-  <button
-    onClick={search}
-    className="px-8 py-4 rounded-xl text-lg font-poppins font-semibold text-white 
-               border border-white/20 backdrop-blur-sm transition
-               hover:border-blue-300 flex items-center"
-    style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
-  >
-    <Search className="inline-block w-6 h-6 mr-2" />
-    Find Programs
-  </button>
-</div>
-
+      <button
+        onClick={search}
+        className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 
+                   rounded-lg sm:rounded-xl 
+                   text-sm sm:text-base md:text-lg 
+                   font-poppins font-semibold text-white 
+                   border border-white/20 backdrop-blur-sm transition
+                   hover:border-blue-300 flex items-center"
+        style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+      >
+        <Search className="inline-block w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mr-1 sm:mr-2" />
+        Find Programs
+      </button>
+    </div>
   </>
 )}
+
 
 {loading && (
   <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">

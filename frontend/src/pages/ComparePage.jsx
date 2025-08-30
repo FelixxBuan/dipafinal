@@ -10,7 +10,7 @@ import {
   GraduationCap,
   ArrowLeft,
 } from "lucide-react";
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 
 function normalize(str) {
   return str.toLowerCase().replace(/\s+/g, " ").trim();

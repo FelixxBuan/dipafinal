@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Users, Search, GraduationCap } from "lucide-react";
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 
 function Home() {
   const navigate = useNavigate();

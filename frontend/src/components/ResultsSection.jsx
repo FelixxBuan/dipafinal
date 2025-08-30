@@ -1,4 +1,4 @@
-import Navbar from "./navbar"; // import your Navbar
+import Navbar from "./Navbar"; // import your Navbar
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import {
