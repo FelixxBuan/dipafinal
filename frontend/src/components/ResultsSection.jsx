@@ -154,9 +154,7 @@ function ResultsSection({ results, message }) {
       {/* Navbar at the top */}
       <Navbar sticky={false} />
 
-      {/* Outer container */}
-      <div className="pt-12 pb-4 px-4 w-full max-w-7xl mx-auto text-white">
-
+      <div className="pt-30 pb-4 px-4 w-full max-w-7xl mx-auto text-white">
 
 
         {/* Title & Note */}
@@ -236,43 +234,49 @@ const PesoIcon = () => (
   }`}
                 onClick={() => setExpandedIndex(isExpanded ? null : index)}
               >
-                {/* Card Header */}
-                <div className="flex items-center gap-4 mb-3">
-                  {item.school_logo && (
-                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-white overflow-visible relative">
-  <img
-    src={item.school_logo}
-    alt={`${item.school} logo`}
-    className="w-20 h-20 object-contain absolute"
-  />
+{/* Card Header */}
+<div className="flex items-center gap-3 mb-3 flex-nowrap w-full px-2 sm:px-3">
+  {/* Logo */}
+  {item.school_logo && (
+    <div className="flex items-center justify-center rounded-full bg-white overflow-hidden relative
+                    w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 flex-shrink-0">
+      <img
+        src={item.school_logo}
+        alt={`${item.school} logo`}
+        className="object-contain w-full h-full"
+      />
+    </div>
+  )}
+
+  {/* Program + School */}
+  <div className="flex-1 min-w-0">
+    <h2 className="font-semibold text-[11px] sm:text-sm md:text-lg text-white truncate">
+      {item.program}
+    </h2>
+    <p className="text-[9px] sm:text-xs md:text-base text-white leading-snug truncate">
+      {item.school}
+    </p>
+  </div>
+
+  {/* Add/Remove Button */}
+  <button
+    className={`rounded-full font-medium transition border border-white/30 backdrop-blur-md text-white shadow-md
+      ${isSelected
+        ? "bg-red-600/40 hover:bg-red-600/60"
+        : "bg-green-600/30 hover:bg-green-600/50"}
+      px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm md:px-4 md:py-2 md:text-sm
+    `}
+    onClick={(e) => {
+      e.stopPropagation();
+      handleCheckboxChange(item);
+    }}
+  >
+    {/* Show + / – on mobile, text on larger screens */}
+    <span className="block sm:hidden">{isSelected ? "−" : "+"}</span>
+    <span className="hidden sm:block">{isSelected ? "Remove" : "Add to Compare"}</span>
+  </button>
 </div>
 
-                  )}
-                  <div className="flex-1">
-                    <h2 className="font-semibold text-xl text-white">{item.program}</h2>
-                    <p className="text-white text-base leading-relaxed">{item.school}</p>
-                  </div>
-
-                 <button
-  className={`!px-2.5 !py-1.5 !rounded-full ${
-    isSelected
-      ? "!bg-red-600/40 hover:!bg-red-600/60"
-      : "!bg-blue-800/20 hover:!bg-blue-800/30"
-  } !backdrop-blur-md !border !border-white/30 !text-white text-xs font-Poppins font-medium !shadow-md transition duration-300 ease-in-out`}
-  style={{ WebkitBackdropFilter: "blur(10px)", backdropFilter: "blur(10px)" }}
-  onClick={(e) => {
-    e.stopPropagation();
-    handleCheckboxChange(item);
-  }}
->
-  {isSelected ? "Remove" : "Add to Compare"}
-</button>
-
-
-
-                </div>
-
-                
 
                 
                 {/* Expanded Section */}
