@@ -157,34 +157,21 @@ function ResultsSection({ results, message }) {
       <div className="pt-30 pb-4 px-4 w-full max-w-7xl mx-auto text-white">
 
 
-        {/* Title & Note */}
-        <div className="flex flex-col items-center mb-8 text-center space-y-3">
-          <h1 className="text-2xl md:text-3xl font-bold font-Merriweather text-white tracking-wide">
-            Top 10 Recommended Programs
-          </h1>
+       {/* Title only */}
+<div className="flex flex-col items-center mb-8 text-center space-y-3">
+  <h1
+  className="font-bold font-Merriweather text-white tracking-wide text-center"
+  style={{
+    fontSize: "clamp(1.25rem, 5vw, 2.5rem)",
+    lineHeight: "clamp(1.5rem, 6vw, 3rem)"
+  }}
+>
+  Top 10 Recommended Programs
+</h1>
 
-          <div className="bg-white/10 backdrop-blur-md rounded-lg px-5 py-3 shadow-md max-w-4xl flex items-start">
-            <svg
-              className="w-5 h-5 text-blue-300 mt-[2px] mr-2 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12A9 9 0 113 12a9 9 0 0118 0z"
-              />
-            </svg>
-            <p className="text-sm text-white/90 leading-snug font-medium">
-              These recommendations are generated based on your stated
-              interests. While we aim to guide you toward relevant options,
-              the final choice is yours to make. We encourage exploring
-              further before deciding.
-            </p>
-          </div>
-        </div>
+
+</div>
+
 
         {/* Main Results Section */}
         <div className="space-y-6">
@@ -228,18 +215,21 @@ const PesoIcon = () => (
 
             return (
               <div
-                key={index}
-                className={`rounded-2xl bg-blue-800/20 backdrop-blur-md border border-white shadow-md transition-all duration-300 cursor-pointer hover:shadow-xl p-6 w-[95%] md:w-[90%] lg:w-[85%] mx-auto ${
-    isExpanded ? "bg-blue-800/40" : ""
-  }`}
-                onClick={() => setExpandedIndex(isExpanded ? null : index)}
-              >
+  key={index}
+  className={`rounded-2xl bg-blue-800/20 backdrop-blur-md border border-white shadow-md 
+  transition-all duration-300 cursor-pointer hover:shadow-xl p-6
+  w-full sm:w-[95%] md:w-[90%] lg:w-[85%] mx-auto
+  ${isExpanded ? "bg-blue-800/40" : ""}`}
+  onClick={() => setExpandedIndex(isExpanded ? null : index)}
+>
+
+
 {/* Card Header */}
-<div className="flex items-center gap-3 mb-3 flex-nowrap w-full px-2 sm:px-3">
+<div className="flex items-center gap-4 mb-3 w-full px-1 sm:px-3">
   {/* Logo */}
   {item.school_logo && (
-    <div className="flex items-center justify-center rounded-full bg-white overflow-hidden relative
-                    w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 flex-shrink-0">
+    <div className="flex items-center justify-center rounded-full bg-white overflow-hidden
+                    w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 flex-shrink-0">
       <img
         src={item.school_logo}
         alt={`${item.school} logo`}
@@ -247,16 +237,17 @@ const PesoIcon = () => (
       />
     </div>
   )}
+ 
+{/* Program + School */}
+<div className="flex-1 min-w-0 text-left">
+  <h2 className="font-semibold text-[13px] sm:text-base md:text-lg text-white line-clamp-3">
+    {item.program}
+  </h2>
+  <p className="text-[12px] sm:text-sm md:text-base text-white opacity-90 line-clamp-2">
+    {item.school}
+  </p>
+</div>
 
-  {/* Program + School */}
-  <div className="flex-1 min-w-0">
-    <h2 className="font-semibold text-[11px] sm:text-sm md:text-lg text-white truncate">
-      {item.program}
-    </h2>
-    <p className="text-[9px] sm:text-xs md:text-base text-white leading-snug truncate">
-      {item.school}
-    </p>
-  </div>
 
   {/* Add/Remove Button */}
   <button
