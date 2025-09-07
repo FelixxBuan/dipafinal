@@ -33,26 +33,32 @@ function Home() {
               <span className="text-blue-400">budget</span>, and{" "}
               <span className="text-blue-400">location preferences</span>.
             </p>
-            <button
-              onClick={() => navigate("/unifinder")}
-              className="
-                inline-flex items-center justify-center gap-2
-                px-5 sm:px-6 md:px-8 lg:px-10
-                py-2 sm:py-2.5 md:py-3 lg:py-3.5
-                rounded-full 
-                bg-blue-900/40 backdrop-blur-md
-                border border-blue-300/40
-                text-white 
-                text-sm sm:text-base md:text-lg lg:text-xl
-                font-Poppins font-medium 
-                shadow-lg 
-                hover:bg-blue-500/50 hover:shadow-xl 
-                transition duration-300 ease-in-out
-              "
-            >
-              Find My Program
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
+           <button
+  onClick={() => navigate("/unifinder")}
+  className="
+    inline-flex items-center justify-center gap-2
+    px-5 sm:px-6 md:px-8 lg:px-10
+    py-2 sm:py-2.5 md:py-3 lg:py-3.5
+    rounded-full 
+    bg-blue-900/40 backdrop-blur-md
+    border border-blue-300/40
+    text-white 
+    text-sm sm:text-base md:text-lg lg:text-xl
+    font-Poppins font-medium 
+    shadow-lg 
+    hover:bg-blue-500/50 hover:shadow-xl 
+    transition duration-300 ease-in-out
+
+    /* Force same look regardless of theme */
+    !bg-blue-900/40 !border-blue-300/40 !text-white
+    dark:!bg-blue-900/40 dark:!border-blue-300/40 dark:!text-white
+  "
+>
+  Find My Program
+  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+</button>
+
+
           </div>
         </section>
 
