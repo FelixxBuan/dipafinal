@@ -272,17 +272,34 @@ const PesoIcon = () => (
 
 
                 
-                {/* Expanded Section */}
+  {/* Expanded Section */}
 {isExpanded && (
   <div
     className="mt-5 text-base animate-fade-in text-white"
     onClick={(e) => e.stopPropagation()}
   >
-    {/* Description */}
-    <p className="text-sm leading-relaxed">{item.description}</p>
-    <p className="text-xs text-right mt-2 italic opacity-80">
-      ⭐ Score: {item.score}
-    </p>
+
+    {/* Dropdown Description with card styling */}
+    <details className="group bg-white/10 p-3 rounded-2xl shadow-md backdrop-blur-md border border-white/20">
+  <summary className="flex items-center justify-between cursor-pointer">
+    <div className="flex items-center gap-2">
+      {/* Changed icon */}
+      <FileText className="w-6 h-6 text-indigo-400" />
+      {/* Bold white with slightly smaller font */}
+      <span className="text-white font-bold text-sm sm:text-base">
+        Program Description
+      </span>
+    </div>
+    <span className="ml-2 transform transition-transform group-open:rotate-180">
+      ⌄
+    </span>
+  </summary>
+
+  <p className="mt-3 text-sm leading-relaxed text-white/90">
+    {item.description || "No description available."}
+  </p>
+</details>
+
 
    {/* Info Grid */}
 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
