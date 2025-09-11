@@ -8,7 +8,8 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from backend.db import db  # ✅ shared DB connection
-from recommendation import recommend
+from backend.recommendation import recommend
+
 
 # Load env
 load_dotenv()
