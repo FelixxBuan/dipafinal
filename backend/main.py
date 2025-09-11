@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from db import db  # ✅ shared DB connection
+from backend.db import db  # ✅ shared DB connection
 from recommendation import recommend
 
 # Load env

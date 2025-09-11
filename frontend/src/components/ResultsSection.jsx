@@ -255,7 +255,7 @@ const PesoIcon = () => (
     !border !border-white/30 backdrop-blur-md !text-white shadow-md
     ${isSelected
       ? "!bg-red-600/40 hover:!bg-red-600/60"
-      : "!bg-green-600/30 hover:!bg-green-600/50"}
+      : "!bg-blue-600/30 hover:!bg-blue-600/50"}   // 👈 changed to blue shades
     px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm md:px-4 md:py-2 md:text-sm
   `}
   onClick={(e) => {
@@ -263,10 +263,10 @@ const PesoIcon = () => (
     handleCheckboxChange(item);
   }}
 >
-  {/* Show + / – on mobile, text on larger screens */}
   <span className="block sm:hidden">{isSelected ? "−" : "+"}</span>
   <span className="hidden sm:block">{isSelected ? "Remove" : "Add to Compare"}</span>
 </button>
+
 
 </div>
 
