@@ -1,22 +1,25 @@
-
-import os
-from dotenv import load_dotenv
 from pymongo import MongoClient
+import os
 
-# Load env variables
-load_dotenv()
-
+# Get MongoDB connection string from environment variable
 MONGO_URI = os.getenv("MONGO_URI")
+
 if not MONGO_URI:
-    raise ValueError("MONGO_URI not set in .env file")
+    raise ValueError("❌ MONGO_URI environment variable is not set!")
 
-# Single MongoClient instance (recommended)
-client = MongoClient(MONGO_URI)
-db = client["unifinder"]
+# Create the MongoDB client with TLS enabled
+client = MongoClient(
+    MONGO_URI,
+    tls=True,
+    tlsAllowInvalidCertificates=True  # fallback for Render SSL issues
+)
 
-# Test connection
+# Test the connection
 try:
     client.admin.command("ping")
-    print("✅ Connected to MongoDB successfully")
+    print("✅ MongoDB connection established!")
 except Exception as e:
     raise RuntimeError(f"❌ Could not connect to MongoDB: {e}")
+
+# Get default database (from URI)
+db = client.get_database()
