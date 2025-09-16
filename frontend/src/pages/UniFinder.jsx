@@ -57,28 +57,28 @@ function UniFinder() {
   const questions = [
   { 
     key: "academics", 
-    title: "What subjects or academic areas do you enjoy the most?", 
-    choices: ["Math", "Science", "English", "History or Social Studies", "PE or Sports", "Arts or Design", "Technology or ICT"] 
+    title: "Which school subjects or learning areas excite you the most?", 
+    choices: ["Math", "Science", "English", "History/Social Studies", "Physical Education", "Arts & Design", "Technology/ICT"] 
   },
   { 
     key: "fields", 
-    title: "Which fields or careers are you most drawn to?", 
-    choices: ["Engineering", "Architecture", "Arts & Media", "Healthcare", "Education", "Social Work", "Law & Government", "Technology"] 
+    title: "Which career industries or professional fields interest you most?", 
+    choices: ["Engineering", "Architecture", "Arts & Media", "Healthcare", "Education", "Community & Social Work", "Law & Governance", "Information Technology"] 
   },
   { 
     key: "activities", 
-    title: "What kinds of tasks or activities do you enjoy doing?", 
-    choices: ["Designing", "Solving problems", "Writing", "fixing things", "mentoring others", "Researching", "Speaking"] 
+    title: "What types of tasks do you naturally enjoy or excel at?", 
+    choices: ["Designing/Creating", "Solving complex problems", "Writing/Storytelling", "Hands-on building/Repairing", "Guiding/Mentoring others", "Researching/Analyzing", "Presenting/Speaking"] 
   },
   { 
     key: "goals", 
-    title: "What goals matter most to you in a future career?", 
-    choices: ["Transforming lives", "Innovating", "Educating", "Business growth", "Promoting justice", "Protecting the environment", "Gaining expertise"] 
+    title: "What outcomes or achievements matter most in your future career?", 
+    choices: ["Improving lives", "Driving innovation", "Educating others", "Growing a business", "Promoting fairness & justice", "Protecting the environment", "Mastering expertise in a field"] 
   },
   { 
     key: "environment", 
-    title: "What environment or setting do you see yourself working in?", 
-    choices: ["Office", "Academic setting", "Hospitals", "Outdoor", "Workshop or laboratory", "Creative space", "Tech-driven"] 
+    title: "What kind of workplace or setting do you see yourself thriving in?", 
+    choices: ["Corporate office", "Academic institution", "Hospital or clinic", "Outdoor/nature setting", "Workshop or laboratory", "Creative studio", "Tech-driven workspace"] 
   }
 ];
 
