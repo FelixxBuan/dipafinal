@@ -1,24 +1,34 @@
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 import numpy as np
+from functools import lru_cache
 
 from backend.db import db  # ✅ shared DB connection
-
-# Load sentence transformer model
-model = SentenceTransformer("all-mpnet-base-v2")
-
-# Load program data from DB
-program_data = list(db["program_vectors"].find({}, {"_id": 0}))
-
-# Load rankings data
-rankings_doc = db["school_rankings"].find_one({}, {"_id": 0})
-rankings_data = rankings_doc["programs"] if rankings_doc and "programs" in rankings_doc else {}
 
 THRESHOLD = 0.4
 CATEGORY_WEIGHT = 0.3  # weight of the school rating in final score
 
 
+@lru_cache(maxsize=1)
+def get_model():
+    return SentenceTransformer("all-MiniLM-L6-v2")
+
+
+@lru_cache(maxsize=1)
+def get_program_data():
+    return list(db["program_vectors"].find({}, {"_id": 0}))
+
+
+@lru_cache(maxsize=1)
+def get_rankings_data():
+    rankings_doc = db["school_rankings"].find_one({}, {"_id": 0})
+    return (
+        rankings_doc["programs"] if rankings_doc and "programs" in rankings_doc else {}
+    )
+
+
 def get_school_rating(school_name, category):
+    rankings_data = get_rankings_data()
     ranked_list = rankings_data.get(category, [])
     for school in ranked_list:
         if school_name.lower() in school["school"].lower():
@@ -26,8 +36,18 @@ def get_school_rating(school_name, category):
     return None
 
 
-def recommend(answers: dict, school_type: str = None, locations: list[str] = None, max_budget: float = None):
+def recommend(
+    answers: dict,
+    school_type: str = None,
+    locations: list[str] = None,
+    max_budget: float = None,
+):
     print("\n📊 Starting Program Matching Breakdown")
+
+    # Lazy-load model and data
+    model = get_model()
+    program_data = get_program_data()
+    rankings_data = get_rankings_data()
 
     # Step 1: Vectorize user answers
     vectors = {}
@@ -48,7 +68,7 @@ def recommend(answers: dict, school_type: str = None, locations: list[str] = Non
             "type": "fallback",
             "message": "No valid input provided. Please answer at least one question.",
             "results": [],
-            "weak_matches": []
+            "weak_matches": [],
         }
 
     combined_vector = np.mean(valid_vectors, axis=0).reshape(1, -1)
@@ -75,7 +95,11 @@ def recommend(answers: dict, school_type: str = None, locations: list[str] = Non
             # 💰 Budget filter
             if max_budget is not None:
                 tuition = entry.get("tuition_per_semester")
-                if tuition is not None and isinstance(tuition, (int, float)) and tuition > max_budget:
+                if (
+                    tuition is not None
+                    and isinstance(tuition, (int, float))
+                    and tuition > max_budget
+                ):
                     continue
 
             # 📈 Cosine similarity
@@ -84,7 +108,11 @@ def recommend(answers: dict, school_type: str = None, locations: list[str] = Non
 
             category = entry.get("category")
             rating_score = get_school_rating(entry["school"], category) or 0
-            final_score = round((similarity_score * (1 - CATEGORY_WEIGHT)) + (rating_score / 10 * CATEGORY_WEIGHT), 3)
+            final_score = round(
+                (similarity_score * (1 - CATEGORY_WEIGHT))
+                + (rating_score / 10 * CATEGORY_WEIGHT),
+                3,
+            )
 
             result_item = {
                 "school": entry["school"],
@@ -127,7 +155,7 @@ def recommend(answers: dict, school_type: str = None, locations: list[str] = Non
             "results": weak_matches[:3],
             "weak_matches": weak_matches[3:7],
             "matched_category": top_category,
-            "top_schools_for_category": top_ranked_schools
+            "top_schools_for_category": top_ranked_schools,
         }
 
     return {
@@ -135,5 +163,5 @@ def recommend(answers: dict, school_type: str = None, locations: list[str] = Non
         "results": strong_matches[:10],
         "weak_matches": weak_matches[:10],
         "matched_category": top_category,
-        "top_schools_for_category": top_ranked_schools
+        "top_schools_for_category": top_ranked_schools,
     }
