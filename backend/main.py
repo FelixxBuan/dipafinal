@@ -1,225 +1,121 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List, Optional
-from fastapi.responses import JSONResponse
-from recommendation import recommend
-import json
 import os
+from typing import List, Optional
 
-app = FastAPI()
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
-# 🌍 CORS setup
+from backend.db import db  # ✅ shared DB connection
+from backend.recommendation import recommend
+
+# Load env
+load_dotenv()
+
+app = FastAPI(
+    title="UniFinder API",
+    description="API for UniFinder, providing program recommendations and data.",
+    version="1.0.0",
+)
+
+# --- Configuration ---
+# 🌍 CORS Setup
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 📁 Load all programs (for testing or front-end fallback)
-@app.get("/programs/all")
-def get_all_programs():
-    file_path = os.path.join("data", "all_programs.json")
-    with open(file_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return JSONResponse(content=data)
-
-# 📨 Model for request body
+# --- Pydantic Models ---
 class SearchRequest(BaseModel):
+    """
+    Model for the request body of the main search endpoint.
+    """
     answers: dict
     school_type: str = "any"
     locations: Optional[List[str]] = None
     max_budget: Optional[float] = None
 
-# 🔍 Main search endpoint
-@app.post("/search")
-def search(data: SearchRequest):
+# --- API Endpoints ---
+
+@app.get("/programs/all", summary="Get all programs from the database")
+async def get_all_programs():
+    try:
+        collection = db["all_programs"]
+        data = list(collection.find({}, {"_id": 0}))
+        return JSONResponse(content=data)
+    except Exception as e:
+        print(f"Error fetching all programs: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while fetching all programs.")
+
+
+@app.post("/search", summary="Get program recommendations based on user answers and filters")
+async def search(request_data: SearchRequest):
     print("📥 Received search request")
-
     result = recommend(
-        answers=data.answers,  # ✅ pass full answers dict now
-        school_type=data.school_type,
-        locations=data.locations,
-        max_budget=data.max_budget,
+        answers=request_data.answers,
+        school_type=request_data.school_type,
+        locations=request_data.locations,
+        max_budget=request_data.max_budget,
     )
-
     return result
 
 
+@app.get("/programs/from-file", summary="Get program vectors (deprecated or specific use)")
+async def get_programs_from_file():
+    try:
+        collection = db["program_vectors"]
+        data = list(collection.find({}, {"_id": 0}))
+        return JSONResponse(content=data)
+    except Exception as e:
+        print(f"Error fetching program vectors from file: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while fetching program vectors.")
 
-@app.get("/programs/showcase")
-def get_program_showcase():
-    return [
-        {
-            "school": "Don Honorio Ventura State University",
-            "school_logo": "/logos/psu.png",
-            "name": "BS Business Administration - Operations Management",
-            "category": "business",
-            "icon": "Briefcase",
-            "description": "Focuses on streamlining business logistics, production, and supply chain efficiency.",
-            "tuition_per_semester": None,
-            "tuition_annual": None,
-            "tuition_notes": "Miscellaneous fees not included, varies by campus and program.",
-            "admission_requirements": "HS diploma, entrance exam, interview.",
-            "grade_requirements": "85% in Math and English.",
-            "school_requirements": "Form 138, PSA Birth Certificate, Certificate of Good Moral.",
-            "school_website": "https://www.dhvsu.edu.ph",
-            "location": "Mexico, Pampanga",
-            "school_type": "Public"
-        },
-        {
-            "school": "Don Honorio Ventura State University",
-            "school_logo": "/logos/psu.png",
-            "name": "BS Computer Science",
-            "category": "technology",
-            "icon": "Code",
-            "description": "Covers algorithms, data structures, and software design, preparing students for tech careers.",
-            "tuition_per_semester": None,
-            "tuition_annual": None,
-            "tuition_notes": "Miscellaneous fees not included, varies by campus and program.",
-            "admission_requirements": "Entrance exam and interview.",
-            "grade_requirements": "GWA 85%, strong Math background.",
-            "school_requirements": "Form 138, PSA, good moral, 2x2 ID picture.",
-            "school_website": "https://www.dhvsu.edu.ph",
-            "location": "Mexico, Pampanga",
-            "school_type": "Public"
-        },
-        {
-            "school": "Don Honorio Ventura State University",
-            "school_logo": "/logos/psu.png",
-            "name": "BS Architecture",
-            "category": "design",
-            "icon": "Ruler",
-            "description": "Covers architectural design, building technology, and planning for urban and rural settings.",
-            "tuition_per_semester": None,
-            "tuition_annual": None,
-            "tuition_notes": "Miscellaneous fees not included, varies by campus and program.",
-            "admission_requirements": "Drawing exam, HS diploma.",
-            "grade_requirements": "85% in Math and Arts-related subjects.",
-            "school_requirements": "Form 138, PSA, portfolio (if any), good moral.",
-            "school_website": "https://www.dhvsu.edu.ph",
-            "location": "Mexico, Pampanga",
-            "school_type": "Public"
-        },
-        {
-            "school": "Don Honorio Ventura State University",
-            "school_logo": "/logos/psu.png",
-            "name": "BS Nursing",
-            "category": "health",
-            "icon": "Stethoscope",
-            "description": "Trains students in patient care, health assessment, and clinical practice.",
-            "tuition_per_semester": None,
-            "tuition_annual": None,
-            "tuition_notes": "Miscellaneous fees not included, varies by campus and program.",
-            "admission_requirements": "HS diploma, entrance test.",
-            "grade_requirements": "GWA 83%, must pass nursing aptitude test.",
-            "school_requirements": "Form 138, PSA, good moral certificate.",
-            "school_website": "https://www.dhvsu.edu.ph",
-            "location": "Mexico, Pampanga",
-            "school_type": "Public"
-        },
-        {
-            "school": "Don Honorio Ventura State University",
-            "school_logo": "/logos/psu.png",
-            "name": "Bachelor of Secondary Education - English",
-            "category": "education",
-            "icon": "BookOpen",
-            "description": "Prepares high school English teachers with strong foundations in literature and communication.",
-            "tuition_per_semester": None,
-            "tuition_annual": None,
-            "tuition_notes": "Miscellaneous fees not included, varies by campus and program.",
-            "admission_requirements": "Interview, entrance exam.",
-            "grade_requirements": "Minimum GWA of 85%, English grade 87% or above.",
-            "school_requirements": "Form 138, good moral, PSA birth certificate.",
-            "school_website": "https://www.dhvsu.edu.ph",
-            "location": "Mexico, Pampanga",
-            "school_type": "Public"
-        },
-        {
-            "school": "Don Honorio Ventura State University",
-            "school_logo": "/logos/psu.png",
-            "name": "BS Civil Engineering",
-            "category": "engineering",
-            "icon": "Wrench",
-            "description": "Prepares students to design, construct, and maintain infrastructure and public works.",
-            "tuition_per_semester": None,
-            "tuition_annual": None,
-            "tuition_notes": "Miscellaneous fees not included, varies by campus and program.",
-            "admission_requirements": "Entrance exam, interview.",
-            "grade_requirements": "At least 85% in Math and Science.",
-            "school_requirements": "Form 138, good moral, PSA birth certificate.",
-            "school_website": "https://www.dhvsu.edu.ph",
-            "location": "Mexico, Pampanga",
-            "school_type": "Public"
-        },
-        {
-            "school": "Don Honorio Ventura State University",
-            "school_logo": "/logos/psu.png",
-            "name": "BS Biology",
-            "category": "science",
-            "icon": "FlaskConical",
-            "description": "Focuses on biological sciences, preparing students for research, teaching, or medical careers.",
-            "tuition_per_semester": None,
-            "tuition_annual": None,
-            "tuition_notes": "Miscellaneous fees not included, varies by campus and program.",
-            "admission_requirements": "HS diploma, entrance exam.",
-            "grade_requirements": "Minimum of 85% in Science and Math.",
-            "school_requirements": "Form 138, PSA, medical clearance.",
-            "school_website": "https://www.dhvsu.edu.ph",
-            "location": "Mexico, Pampanga",
-            "school_type": "Public"
-        },
-        {
-            "school": "Don Honorio Ventura State University",
-            "school_logo": "/logos/psu.png",
-            "name": "Bachelor of Fine Arts",
-            "category": "arts",
-            "icon": "Palette",
-            "description": "Focuses on visual arts, multimedia, and design fundamentals for creative careers.",
-            "tuition_per_semester": None,
-            "tuition_annual": None,
-            "tuition_notes": "Miscellaneous fees not included, varies by campus and program.",
-            "admission_requirements": "Art portfolio, HS diploma, entrance test.",
-            "grade_requirements": "80% GWA with strength in art subjects.",
-            "school_requirements": "Form 138, good moral, PSA.",
-            "school_website": "https://www.dhvsu.edu.ph",
-            "location": "Mexico, Pampanga",
-            "school_type": "Public"
-        },
-        {
-            "school": "Don Honorio Ventura State University",
-            "school_logo": "/logos/psu.png",
-            "name": "BS Criminology",
-            "category": "law",
-            "icon": "ShieldCheck",
-            "description": "Studies criminal behavior, law enforcement, and forensic science for public safety careers.",
-            "tuition_per_semester": None,
-            "tuition_annual": None,
-            "tuition_notes": "Miscellaneous fees not included, varies by campus and program.",
-            "admission_requirements": "Entrance exam, HS graduate.",
-            "grade_requirements": "GWA 80%, no failing grade in behavior.",
-            "school_requirements": "Form 138, good moral, PSA.",
-            "school_website": "https://www.dhvsu.edu.ph",
-            "location": "Mexico, Pampanga",
-            "school_type": "Public"
-        },
-        {
-            "school": "Don Honorio Ventura State University",
-            "school_logo": "/logos/psu.png",
-            "name": "Bachelor of Science in Psychology",
-            "category": "social_science",
-            "icon": "Brain",
-            "description": "Explores mental processes, behavior, and human development for counseling or research careers.",
-            "tuition_per_semester": None,
-            "tuition_annual": None,
-            "tuition_notes": "Miscellaneous fees not included, varies by campus and program.",
-            "admission_requirements": "Interview, entrance test.",
-            "grade_requirements": "80% average or above.",
-            "school_requirements": "Form 138, good moral certificate, PSA.",
-            "school_website": "https://www.dhvsu.edu.ph",
-            "location": "Mexico, Pampanga",
-            "school_type": "Public"
-        }
-    ]
+
+@app.get("/api/school-strengths", summary="Get school strengths data")
+async def get_school_strengths():
+    try:
+        collection = db["school_strengths"]
+        docs = list(collection.find({}, {"_id": 0}))
+        return JSONResponse(content={"schools": docs})
+    except Exception as e:
+        print(f"❌ Error fetching school_strengths: {e}")
+        raise HTTPException(status_code=500, detail=f"Database error while fetching school strengths: {e}")
+
+
+@app.get("/school-rankings", summary="Get school rankings data")
+async def get_school_rankings():
+    try:
+        collection = db["school_rankings"]
+        doc = collection.find_one({}, {"_id": 0})
+        return JSONResponse(content=doc if doc else {}, status_code=200)
+    except Exception as e:
+        print(f"❌ Error fetching school_rankings: {e}")
+        raise HTTPException(status_code=500, detail=f"Database error while fetching school rankings: {e}")
+
+
+@app.get("/programs/search", summary="Search programs by name, location, or category")
+async def search_programs(
+    name: Optional[str] = Query(None, max_length=100),
+    location: Optional[str] = Query(None, max_length=100),
+    category: Optional[str] = Query(None, max_length=100),
+):
+    query = {}
+    if name:
+        query["name"] = {"$regex": name, "$options": "i"}
+    if location:
+        query["location"] = {"$regex": location, "$options": "i"}
+    if category:
+        query["category"] = {"$regex": category, "$options": "i"}
+
+    try:
+        data = list(db["all_programs"].find(query, {"_id": 0}))
+        return JSONResponse(content=data)
+    except Exception as e:
+        print(f"Error searching programs: {e}")
+        raise HTTPException(status_code=500, detail=f"Database error during program search: {e}")
