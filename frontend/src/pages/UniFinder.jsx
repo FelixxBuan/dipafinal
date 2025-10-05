@@ -179,8 +179,10 @@ const ProgressBar = () => {
   return (
     <>
       <Navbar />
-     <div className="min-h-screen bg-gradient-to-br from-[#020617] to-[#0a0f1f] 
-                px-4 text-white pt-16 sm:pt-20 lg:pt-36">
+     <div className="min-h-screen bg-gradient-to-tr from-[#0a0f2e] via-[#0d1a45] to-[#102a5c] px-4 text-white pt-16 sm:pt-20 lg:pt-36">
+
+
+
 
 
 

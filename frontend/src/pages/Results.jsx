@@ -20,7 +20,7 @@ function Results() {
   }, [navigate]);
 
   return (
-      <div className="min-h-screen bg-gradient-to-br from-[#020617] to-[#0a0f1f] pt-6 px-4 text-white">
+      <div className="min-h-screen bg-gradient-to-tr from-[#0a0f2e] via-[#0d1a45] to-[#102a5c] text-white font-Poppins">
       
         
         <ResultsSection results={results} message={message} />

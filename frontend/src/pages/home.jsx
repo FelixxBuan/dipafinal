@@ -1,10 +1,36 @@
+import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, Search, GraduationCap } from "lucide-react";
+import { Users, Search, GraduationCap, MapPin, Check } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { ArrowRight } from "lucide-react";
 
 function Home() {
   const navigate = useNavigate();
+
+  // refs
+  const howItWorksRef = useRef(null);
+  const scrollContainerRef = useRef(null);
+
+  const NAVBAR_HEIGHT = 80; // px
+
+  const handleScrollToHowItWorks = () => {
+    const container = scrollContainerRef.current;
+    const element = howItWorksRef.current;
+
+    if (container && element) {
+      const containerRect = container.getBoundingClientRect();
+      const elemRect = element.getBoundingClientRect();
+      const offsetTop =
+        elemRect.top - containerRect.top + container.scrollTop - NAVBAR_HEIGHT;
+      container.scrollTo({ top: offsetTop, behavior: "smooth" });
+      return;
+    }
+
+    if (element) {
+      const yOffset = -NAVBAR_HEIGHT;
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
 
   return (
     <>
@@ -13,123 +39,159 @@ function Home() {
         <Navbar />
       </div>
 
-      {/* Global Wrapper with swipe snapping */}
-      <div className="h-screen overflow-y-scroll snap-y snap-mandatory bg-gradient-to-br from-[#020617] to-[#0a0f1f] text-white font-Poppins">
-        
-        {/* Hero Section */}
-        <section className="h-screen snap-start flex items-center justify-center px-3 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-Merriweather font-extrabold leading-snug mb-4 sm:mb-6">
-              Explore Your Ideal
-              <span className="text-blue-400 block drop-shadow-lg">
-                University & Program
-              </span>
-            </h1>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 mb-6 sm:mb-10 max-w-xl mx-auto">
-              UniFinder helps you locate the perfect{" "}
-              <span className="text-blue-400">school</span> and{" "}
-              <span className="text-blue-400">program</span> tailored to your{" "}
-              <span className="text-blue-400">interests</span>,{" "}
-              <span className="text-blue-400">budget</span>, and{" "}
-              <span className="text-blue-400">location preferences</span>.
-            </p>
-           <button
-  onClick={() => navigate("/unifinder")}
-  className="
-    inline-flex items-center justify-center gap-2
-    px-5 sm:px-6 md:px-8 lg:px-10
-    py-2 sm:py-2.5 md:py-3 lg:py-3.5
-    rounded-full 
-    !bg-blue-900/40 backdrop-blur-md
-    !border !border-blue-300/40
-    !text-white 
-    text-sm sm:text-base md:text-lg lg:text-xl
-    font-Poppins font-medium 
-    shadow-lg 
-    hover:!bg-blue-500/50 hover:shadow-xl 
-    transition duration-300 ease-in-out
-  "
+      {/* Scroll container */}
+      <div
+  ref={scrollContainerRef}
+  className="h-screen overflow-y-scroll bg-gradient-to-tr from-[#0a0f2e] via-[#0d1a45] to-[#102a5c]
+ text-white font-Poppins"
 >
-  Find My Program
-  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-</button>
+
+        {/* Hero Section */}
+        <section className="h-screen flex flex-col justify-center px-3 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-Poppins font-extrabold leading-snug mb-4 sm:mb-6 text-white drop-shadow-lg">
+  Ready to Find Your Future?
+</h1>
 
 
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 leading-relaxed">
+              Find the Right Path for Your Future. With UniFinder, explore schools and programs
+              designed around your passions, budget, and location.
+            </p>
+
+            <div className="flex justify-center gap-4 mb-8">
+              <button
+                type="button"
+                onClick={() => navigate("/unifinder")}
+                className="w-40 sm:w-44 md:w-48 lg:w-52 py-3 sm:py-3.5 md:py-4 rounded-lg !bg-blue-900/40 backdrop-blur-md !border !border-blue-300/40 !text-white text-sm sm:text-base md:text-lg lg:text-xl font-Poppins font-medium shadow-lg hover:!bg-blue-600/50 hover:shadow-xl transition duration-300 ease-in-out"
+              >
+                Find My Program
+              </button>
+
+              <button
+                type="button"
+                onClick={handleScrollToHowItWorks}
+                className="w-40 sm:w-44 md:w-48 lg:w-52 py-3 sm:py-3.5 md:py-4 rounded-lg !bg-blue-500/30 backdrop-blur-md !border !border-blue-200/40 !text-white text-sm sm:text-base md:text-lg lg:text-xl font-Poppins font-medium shadow-lg hover:!bg-blue-400/40 hover:shadow-xl transition duration-300 ease-in-out"
+              >
+                Learn More
+              </button>
+            </div>
+
+            {/* Quick Stats */}
+<div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full max-w-4xl flex flex-wrap justify-center gap-6 sm:gap-36 text-center px-4">
+  {/* Programs */}
+  <div className="flex flex-col items-center flex-1 max-w-[90px] sm:max-w-none">
+    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-900/40 backdrop-blur-md flex items-center justify-center mb-1 sm:mb-2">
+      <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
+    </div>
+    <h3 className="text-xl sm:text-2xl font-extrabold text-yellow-400">50+</h3>
+    <span className="text-white/80 text-[10px] sm:text-xs">Programs Listed</span>
+  </div>
+
+  {/* Schools (Middle one stays the same) */}
+  <div className="flex flex-col items-center flex-1 max-w-[120px] sm:max-w-none">
+    <div className="w-12 h-12 rounded-full bg-blue-900/40 backdrop-blur-md flex items-center justify-center mb-2">
+      <Users className="w-6 h-6 text-blue-400" />
+    </div>
+    <h3 className="text-2xl font-extrabold text-blue-400">Pampanga</h3>
+    <span className="text-white/80 text-xs sm:text-sm">Leading Schools</span>
+  </div>
+
+  {/* Time */}
+  <div className="flex flex-col items-center flex-1 max-w-[90px] sm:max-w-none">
+    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-900/40 backdrop-blur-md flex items-center justify-center mb-1 sm:mb-2">
+      <Check className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
+    </div>
+    <h3 className="text-xl sm:text-2xl font-extrabold text-green-400">1 min</h3>
+    <span className="text-white/80 text-[10px] sm:text-xs">Avg Completion</span>
+  </div>
+</div>
+
+
+
+            
           </div>
         </section>
 
         {/* How It Works Section */}
-        <section className="h-screen snap-start flex items-center justify-center px-3 py-8 sm:py-12 md:py-16 lg:py-20 relative z-10">
-          <div className="container mx-auto px-3">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-Merriweather font-bold text-center mb-8 sm:mb-12 md:mb-16">
-              How Uni-Finder Works
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8 md:gap-10 max-w-6xl mx-auto">
-              
-              {/* Step 1 */}
-              <div className="bg-blue-900/40 backdrop-blur-md border border-blue-300/40 rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 hover:bg-blue-500/50 transition-all duration-300">
-                <div className="text-center">
-                  <div className="bg-blue-500/20 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 md:mb-6">
-                    <Users className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-blue-400" />
-                  </div>
-                  <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 sm:mb-3 md:mb-4">
-                    1. Share Your Interests
-                  </h3>
-                  <p className="text-white/70 text-xs sm:text-sm md:text-base">
-                    Tell us about your passions, hobbies, and career interests to
-                    help us understand what you’re looking for.
-                  </p>
-                </div>
-              </div>
+<section
+  ref={howItWorksRef}
+  className="flex items-center justify-center px-4 sm:px-6 py-12 sm:py-16 md:py-20 relative z-10"
+>
+  <div className="container mx-auto px-2 sm:px-6">
+    <h2 className="text-2xl sm:text-3xl md:text-4xl font-Merriweather font-bold text-center mb-12 sm:mb-16">
+      Step Into Your Future with Uni-Finder
+    </h2>
 
-              {/* Step 2 */}
-              <div className="bg-blue-900/40 backdrop-blur-md border border-blue-300/40 rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 hover:bg-blue-500/50 transition-all duration-300">
-                <div className="text-center">
-                  <div className="bg-green-500/20 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 md:mb-6">
-                    <Search className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-400" />
-                  </div>
-                  <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 sm:mb-3 md:mb-4">
-                    2. Set Your Preferences
-                  </h3>
-                  <p className="text-white/70 text-xs sm:text-sm md:text-base">
-                    Choose between public or private institutions, set your
-                    budget range, and select your preferred locations.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 3 */}
-              <div className="bg-blue-900/40 backdrop-blur-md border border-blue-300/40 rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 hover:bg-blue-500/50 transition-all duration-300">
-                <div className="text-center">
-                  <div className="bg-purple-500/20 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 md:mb-6">
-                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-purple-400" />
-                  </div>
-                  <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 sm:mb-3 md:mb-4">
-                    3. Get Recommendations
-                  </h3>
-                  <p className="text-white/70 text-xs sm:text-sm md:text-base">
-                    Receive personalized program and school recommendations that
-                    match your criteria perfectly.
-                  </p>
-                </div>
-              </div>
-            </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-16 max-w-7xl mx-auto">
+      {/* Step 1 */}
+      <div className="bg-blue-900/40 backdrop-blur-md border border-blue-300/40 rounded-2xl shadow-lg flex flex-col items-center text-center aspect-auto sm:aspect-square min-h-[250px] sm:min-h-[320px] transition-all duration-300 hover:border-blue-400 hover:shadow-[0_0_20px_rgba(59,130,246,0.8)] p-6 sm:p-10">
+        <div className="flex flex-col items-center mb-4 sm:mb-6">
+          <div className="bg-blue-500/20 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center">
+            <Users className="w-8 h-8 sm:w-10 sm:h-10 text-blue-400" />
           </div>
-        </section>
+          <h3 className="text-lg sm:text-xl font-semibold mt-2 sm:mt-4">1. Answer Questions</h3>
+        </div>
+        <p className="text-white/70 text-xs sm:text-sm md:text-base">
+          Share your preferences in five categories: Academics, Fields, Activities, Goals, and Work Environment.
+        </p>
+      </div>
+
+      {/* Step 2 */}
+      <div className="bg-blue-900/40 backdrop-blur-md border border-blue-300/40 rounded-2xl shadow-lg flex flex-col items-center text-center aspect-auto sm:aspect-square min-h-[250px] sm:min-h-[320px] transition-all duration-300 hover:border-green-400 hover:shadow-[0_0_20px_rgba(34,197,94,0.8)] p-6 sm:p-10">
+        <div className="flex flex-col items-center mb-4 sm:mb-6">
+          <div className="bg-green-500/20 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center">
+            <Search className="w-8 h-8 sm:w-10 sm:h-10 text-green-400" />
+          </div>
+          <h3 className="text-lg sm:text-xl font-semibold mt-2 sm:mt-4">2. Choose School Type</h3>
+        </div>
+        <p className="text-white/70 text-xs sm:text-sm md:text-base">
+          Select if you prefer public or private institutions to narrow down your choices.
+        </p>
+      </div>
+
+      {/* Step 3 */}
+      <div className="bg-blue-900/40 backdrop-blur-md border border-blue-300/40 rounded-2xl shadow-lg flex flex-col items-center text-center aspect-auto sm:aspect-square min-h-[250px] sm:min-h-[320px] transition-all duration-300 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(168,85,247,0.8)] p-6 sm:p-10">
+        <div className="flex flex-col items-center mb-4 sm:mb-6">
+          <div className="bg-purple-500/20 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center">
+            <MapPin className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400" />
+          </div>
+          <h3 className="text-lg sm:text-xl font-semibold mt-2 sm:mt-4">3. Pick Location</h3>
+        </div>
+        <p className="text-white/70 text-xs sm:text-sm md:text-base">
+          Decide where you’d like to study by selecting your preferred area.
+        </p>
+      </div>
+
+      {/* Step 4 */}
+      <div className="bg-blue-900/40 backdrop-blur-md border border-blue-300/40 rounded-2xl shadow-lg flex flex-col items-center text-center aspect-auto sm:aspect-square min-h-[250px] sm:min-h-[320px] transition-all duration-300 hover:border-yellow-400 hover:shadow-[0_0_20px_rgba(250,204,21,0.8)] p-6 sm:p-10">
+        <div className="flex flex-col items-center mb-4 sm:mb-6">
+          <div className="bg-yellow-500/20 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center">
+            <GraduationCap className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-400" />
+          </div>
+          <h3 className="text-lg sm:text-xl font-semibold mt-2 sm:mt-4">4. See Your Results</h3>
+        </div>
+        <p className="text-white/70 text-xs sm:text-sm md:text-base">
+          Get instant school and program recommendations tailored to your preferences.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
         {/* FAQ Section */}
-        <section className="h-screen snap-start flex items-center justify-center border-t border-white/10 px-3 py-8 sm:py-12 md:py-16 lg:py-20 relative z-10">
+        <section className="flex items-center justify-center px-6 py-12 sm:py-16 md:py-20 relative z-10">
           <div className="container mx-auto max-w-3xl">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-Merriweather font-bold text-center mb-6 sm:mb-8 md:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-Merriweather font-bold text-center mb-8 sm:mb-10 md:mb-12">
               Frequently Asked Questions
             </h2>
 
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-4 sm:space-y-5">
               {[
                 {
                   question: "What is UniFinder?",
                   answer:
-                    "UniFinder is a smart recommendation platform that helps students discover ideal programs and schools based on their preferences like interests, location, and budget.",
+                    "UniFinder is a smart recommendation platform that helps students discover ideal programs and schools based on their preferences like academics, fields, activities, goals, work environment, school type, and location.",
                 },
                 {
                   question: "Is UniFinder free to use?",
@@ -138,25 +200,28 @@ function Home() {
                 {
                   question: "How accurate are the recommendations?",
                   answer:
-                    "Our recommendations are generated using smart filters and similarity matching to align with the data you provide. The more accurate your input, the better the results.",
+                    "Our recommendations are generated using smart filters and similarity matching. The more precise your answers to the 5 preference categories, the better your results.",
                 },
                 {
                   question: "Can I use UniFinder without creating an account?",
                   answer:
-                    "Yes. You can try UniFinder without an account, but creating one lets you save your preferences and get better suggestions.",
+                    "Yes. You can try UniFinder without an account, but creating one lets you save your preferences, revisit your choices, and get more personalized suggestions.",
+                },
+                {
+                  question: "How long does it take to get results?",
+                  answer:
+                    "It’s almost instant! After answering the 5 questions and selecting your school type and location, UniFinder generates recommendations immediately.",
                 },
               ].map((faq, index) => (
                 <details
                   key={index}
-                  className="bg-blue-900/40 backdrop-blur-md border border-blue-300/40 rounded-xl sm:rounded-2xl shadow-lg p-3 sm:p-4 md:p-5 hover:bg-blue-500/50 transition-all duration-300"
+                  className="bg-blue-900/40 backdrop-blur-md border border-blue-300/40 rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 hover:bg-blue-500/50 transition-all duration-300"
                 >
                   <summary className="font-semibold text-sm sm:text-base md:text-lg cursor-pointer flex justify-between items-center text-white group-open:text-blue-400">
                     {faq.question}
-                    <span className="ml-2 transform transition-transform group-open:rotate-180">
-                      ⌄
-                    </span>
+                    <span className="ml-2 transform transition-transform group-open:rotate-180">⌄</span>
                   </summary>
-                  <p className="mt-2 sm:mt-3 text-white/70 text-xs sm:text-sm md:text-base">
+                  <p className="mt-2 sm:mt-3 text-white/70 text-sm sm:text-base md:text-base">
                     {faq.answer}
                   </p>
                 </details>

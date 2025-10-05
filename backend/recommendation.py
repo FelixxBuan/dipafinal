@@ -2,7 +2,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 import numpy as np
 
-from db import db  # ✅ shared DB connection
+from db import db  #shared DB connection
 
 # Load sentence transformer model
 model = SentenceTransformer("all-mpnet-base-v2")

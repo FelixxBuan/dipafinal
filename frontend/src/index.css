@@ -115,5 +115,23 @@ h1 {
 }
 
 
+.aurora-gradient {
+  background: linear-gradient(
+    135deg,
+    #0a0f1f,
+    #1e3a8a,
+    #2563eb,
+    #3b82f6,
+    #020617
+  );
+  background-size: 300% 300%;
+  animation: aurora 15s ease infinite;
+}
+
+@keyframes aurora {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
 

@@ -157,20 +157,29 @@ function ResultsSection({ results, message }) {
       <div className="pt-30 pb-4 px-4 w-full max-w-7xl mx-auto text-white">
 
 
-       {/* Title only */}
-<div className="flex flex-col items-center mb-8 text-center space-y-3">
+    {/* Title Section */}
+<div className="flex flex-col items-center mb-12 mt-12 text-center space-y-6 w-full px-4">
+  {/* Title */}
   <h1
-  className="font-bold font-Merriweather text-white tracking-wide text-center"
-  style={{
-    fontSize: "clamp(1.25rem, 5vw, 2.5rem)",
-    lineHeight: "clamp(1.5rem, 6vw, 3rem)"
-  }}
->
-  Top 10 Recommended Programs
-</h1>
+    className="font-bold font-Merriweather text-white text-center w-full"
+    style={{
+      fontSize: "clamp(1.5rem, 5vw, 3rem)",
+      lineHeight: "clamp(2rem, 6vw, 3.5rem)",
+    }}
+  >
+    Top 10 Recommended Programs
+  </h1>
 
-
+  {/* Disclaimer Container */}
+  <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-8 py-5 max-w-5xl w-full text-center">
+    <p className="text-xs sm:text-sm text-white/80">
+      ⚠️ Disclaimer: The results shown are recommendations based on your inputs and available school data. 
+      They are for reference only and should not replace official guidance from the institutions.
+    </p>
+  </div>
 </div>
+
+
 
 
         {/* Main Results Section */}
@@ -264,7 +273,7 @@ const PesoIcon = () => (
   }}
 >
   <span className="block sm:hidden">{isSelected ? "−" : "+"}</span>
-  <span className="hidden sm:block">{isSelected ? "Remove" : "Add to Compare"}</span>
+  <span className="hidden sm:block">{isSelected ? "Remove" : "Compare"}</span>
 </button>
 
 
@@ -530,19 +539,54 @@ const PesoIcon = () => (
               </div>
             );
           })}
+          
+          {/* Centered Buttons Container */}
+<div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8 px-4">
+  {/* Try Again Button */}
+  <button
+    onClick={() => navigate("/unifinder")}
+    className="flex items-center justify-center gap-2 text-white text-xs sm:text-sm font-Poppins font-medium 
+               !px-8 !py-3 sm:!px-8 sm:!py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md 
+               !border !border-white/30 !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out 
+               w-full sm:w-auto"
+    style={{
+      WebkitBackdropFilter: "blur(10px)",
+      backdropFilter: "blur(10px)",
+    }}
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={2}
+      stroke="currentColor"
+      className="w-5 h-5"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+    </svg>
+    <span>Try Again</span>
+  </button>
 
-          {/* Compare Button */}
-          {selectedSchools.length >= 2 && (
-            <div className="text-center mt-6">
-              <button
-                className="!px-8 !py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out"
-                style={{ WebkitBackdropFilter: "blur(10px)", backdropFilter: "blur(10px)" }}
-                onClick={() => navigate("/compare-program", { state: { selectedSchools } })}
-              >
-                Compare Now ({selectedSchools.length})
-              </button>
-            </div>
-          )}
+  {/* Compare Button (only shows if 2 or more selected) */}
+  {selectedSchools.length >= 2 && (
+    <button
+      className="flex items-center justify-center text-white text-xs sm:text-sm font-Poppins font-medium 
+                 !px-8 !py-3 sm:!px-8 sm:!py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md 
+                 !border !border-white/30 !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out 
+                 w-full sm:w-auto"
+      style={{
+        WebkitBackdropFilter: "blur(10px)",
+        backdropFilter: "blur(10px)",
+      }}
+      onClick={() => navigate("/compare-program", { state: { selectedSchools } })}
+    >
+      Compare Now ({selectedSchools.length})
+    </button>
+  )}
+</div>
+
+            
+          
         </div>
       </div>
     </div>
