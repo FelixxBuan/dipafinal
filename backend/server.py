@@ -7,7 +7,7 @@ client = MongoClient(MONGO_URI)
 db = client["unifinder"]
 collection = db["school_strengths"]
 
-# Load JSON file
+# Load JSON files
 with open("school_strengths.json", "r", encoding="utf-8") as f:
     data = json.load(f)
 
