@@ -22,6 +22,7 @@ app = FastAPI(
 # --- Configuration ---
 # 🌍 CORS Setup
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+print("ALLOWED_ORIGINS:", ALLOWED_ORIGINS)
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,7 +32,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-print("ALLOWED_ORIGINS:", ALLOWED_ORIGINS)
 
 # --- Pydantic Models ---
 class SearchRequest(BaseModel):
