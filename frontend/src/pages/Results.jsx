@@ -20,7 +20,13 @@ function Results() {
   }, [navigate]);
 
   return (
-      <div className="min-h-screen bg-gradient-to-tr from-[#0a0f2e] via-[#0d1a45] to-[#102a5c] text-white font-Poppins">
+      <div
+  className="min-h-screen bg-cover bg-center bg-no-repeat text-white font-Poppins"
+  style={{
+    backgroundImage: "url('/images/bg10.jpg')",
+  }}
+>
+
       
         
         <ResultsSection results={results} message={message} />

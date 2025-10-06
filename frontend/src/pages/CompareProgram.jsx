@@ -69,14 +69,22 @@ export default function CompareProgram() {
 
   if (!selectedSchools.length) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#020617] to-[#0a0f1f] pt-20 px-4 text-white font-Poppins">
+      <div
+        className="min-h-screen bg-cover bg-center text-white font-Poppins"
+        style={{
+          backgroundImage: "url('/images/compare-bg.jpg')",
+        }}
+      >
         <Navbar />
-        <div className="p-8 text-center text-white">
-          <p>No schools selected for comparison.</p>
+        <div className="p-6 sm:p-8 text-center text-white pt-24 font-Poppins">
+          <p className="text-sm sm:text-base">No schools selected for comparison.</p>
           <button
             onClick={() => navigate(-1)}
-            className="!px-8 !py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out"
-            style={{ WebkitBackdropFilter: "blur(10px)", backdropFilter: "blur(10px)" }}
+            className="mt-4 !px-6 sm:!px-8 !py-2.5 sm:!py-3 !rounded-full !bg-blue-800/30 !backdrop-blur-md !border !border-white/30 !text-white text-xs sm:text-sm font-medium !shadow-lg hover:!bg-blue-800/40 transition duration-300 ease-in-out"
+            style={{
+              WebkitBackdropFilter: "blur(10px)",
+              backdropFilter: "blur(10px)",
+            }}
           >
             Go Back
           </button>
@@ -88,78 +96,78 @@ export default function CompareProgram() {
   const normalizedSchools = selectedSchools.map((s) => normalizeSchool(s));
 
   const rows = [
-    { label: "Program", key: "program", icon: <BookOpen className="w-5 h-5 inline mr-1 text-sky-400" /> },
-    { label: "Category", key: "category", icon: <ListChecks className="w-5 h-5 inline mr-1 text-sky-400" /> },
-    { label: "Type", key: "school_type", icon: <Building2 className="w-5 h-5 inline mr-1 text-sky-400" /> },
-    { label: "Location", key: "location", icon: <MapPin className="w-5 h-5 inline mr-1 text-sky-400" /> },
-    { label: "Admission Requirements", key: "admission_requirements", icon: <FileText className="w-5 h-5 inline mr-1 text-sky-400" /> },
-    { label: "Grade Requirements", key: "grade_requirements", icon: <ListChecks className="w-5 h-5 inline mr-1 text-sky-400" /> },
-    { label: "Other Requirements", key: "school_requirements", icon: <FileText className="w-5 h-5 inline mr-1 text-sky-400" /> },
-    { label: "Tuition / Semester", key: "tuition_per_semester", icon: <DollarSign className="w-5 h-5 inline mr-1 text-sky-400" /> },
-    { label: "Tuition / Year", key: "tuition_annual", icon: <DollarSign className="w-5 h-5 inline mr-1 text-sky-400" /> },
-    { label: "Tuition Notes", key: "tuition_notes", icon: <FileText className="w-5 h-5 inline mr-1 text-sky-400" /> },
-    { label: "Board Passing Rate", key: "board_passing_rate", icon: <GraduationCap className="w-5 h-5 inline mr-1 text-sky-400" /> },
-    { label: "Website", key: "school_website", icon: <Globe className="w-5 h-5 inline mr-1 text-sky-400" />, isLink: true },
+    { label: "Program", key: "program", icon: <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 text-sky-400" /> },
+    { label: "Category", key: "category", icon: <ListChecks className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 text-sky-400" /> },
+    { label: "Type", key: "school_type", icon: <Building2 className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 text-sky-400" /> },
+    { label: "Location", key: "location", icon: <MapPin className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 text-sky-400" /> },
+    { label: "Admission Requirements", key: "admission_requirements", icon: <FileText className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 text-sky-400" /> },
+    { label: "Grade Requirements", key: "grade_requirements", icon: <ListChecks className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 text-sky-400" /> },
+    { label: "Other Requirements", key: "school_requirements", icon: <FileText className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 text-sky-400" /> },
+    { label: "Tuition / Semester", key: "tuition_per_semester", icon: <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 text-sky-400" /> },
+    { label: "Tuition / Year", key: "tuition_annual", icon: <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 text-sky-400" /> },
+    { label: "Tuition Notes", key: "tuition_notes", icon: <FileText className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 text-sky-400" /> },
+    { label: "Board Passing Rate", key: "board_passing_rate", icon: <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 text-sky-400" /> },
+    { label: "Website", key: "school_website", icon: <Globe className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 text-sky-400" />, isLink: true },
   ];
 
   const softGradients = [
-    "from-[#1e3a8a]/40 via-[#3b82f6]/20 to-[#93c5fd]/10", // soft blue
+    "from-[#1e3a8a]/40 via-[#3b82f6]/20 to-[#93c5fd]/10", // blue
     "from-[#6d28d9]/30 via-[#8b5cf6]/20 to-[#c4b5fd]/10", // violet
-    "from-[#3730a3]/30 via-[#6366f1]/20 to-[#a5b4fc]/10", // indigo
-
-    "from-[#064e3b]/30 via-[#10b981]/20 to-[#6ee7b7]/10", // jade green
-    "from-[#92400e]/30 via-[#f59e0b]/20 to-[#fcd34d]/10", // amber
-    "from-[#7c2d12]/30 via-[#ea580c]/20 to-[#fdba74]/10", // warm orange
-    "from-[#1e293b]/30 via-[#334155]/20 to-[#64748b]/10", // gray-blue
+    "from-[#064e3b]/30 via-[#10b981]/20 to-[#6ee7b7]/10", // green
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-[#0a0f2e] via-[#0d1a45] to-[#102a5c] pt-20 px-2 sm:px-4 text-white pb-24 font-Poppins">
+    <div
+      className="min-h-screen bg-cover bg-center bg-no-repeat text-white pt-20 px-4 sm:px-8 pb-28 font-Poppins"
+      style={{
+        backgroundImage: "url('/images/bg10.jpg')",
+      }}
+    >
       <Navbar />
 
       {/* School Cards Grid */}
       <div
-        className="mt-16 grid gap-4 sm:gap-6"
+        className="mt-12 grid gap-8 sm:gap-10 justify-center"
         style={{
           gridTemplateColumns:
             normalizedSchools.length === 1
-              ? "1fr"
+              ? "minmax(280px, 480px)"
               : normalizedSchools.length === 2
               ? "repeat(auto-fit, minmax(260px, 1fr))"
-              : "repeat(auto-fit, minmax(280px, 1fr))",
+              : "repeat(auto-fit, minmax(240px, 1fr))",
         }}
       >
         {normalizedSchools.map((s, idx) => (
           <div
             key={idx}
-            className={`bg-gradient-to-br ${softGradients[idx % softGradients.length]} border border-white/30 rounded-2xl p-5 shadow-lg hover:shadow-xl transition backdrop-blur-md`}
+            className={`bg-gradient-to-br ${softGradients[idx % softGradients.length]} border border-white/30 rounded-3xl p-5 sm:p-8 shadow-xl hover:shadow-2xl transition backdrop-blur-lg`}
             style={{
-              WebkitBackdropFilter: "blur(12px)",
-              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(16px)",
+              backdropFilter: "blur(16px)",
             }}
           >
             {/* School Header */}
-            <div className="flex flex-col items-center mb-5">
+            <div className="flex flex-col items-center mb-6 sm:mb-8">
               {hasValue(s.school_logo) && (
                 <img
                   src={s.school_logo}
                   alt={s.school}
-                  className="w-14 h-14 sm:w-16 sm:h-16 object-contain rounded-full mb-3 bg-white p-1"
+                  className="w-16 h-16 sm:w-24 sm:h-24 object-contain rounded-full mb-3 sm:mb-4 bg-white p-1.5 sm:p-2"
                 />
               )}
-              <h2 className="font-semibold text-gray-100 text-center text-sm sm:text-base break-words font-Poppins">
+              <h2 className="font-semibold text-gray-100 text-center text-base sm:text-xl break-words">
                 {s.school}
               </h2>
             </div>
 
             {/* Features */}
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 sm:gap-4">
               {rows.map((row, rIdx) => (
                 <div
                   key={rIdx}
-                  className="bg-white/10 rounded-lg p-3 flex flex-col text-left hover:bg-white/20 transition"
+                  className="bg-white/10 rounded-xl p-3 sm:p-4 flex flex-col text-left hover:bg-white/20 transition"
                 >
-                  <h3 className="font-medium text-gray-200 flex items-center gap-1 mb-1 text-sm font-Poppins">
+                  <h3 className="font-semibold text-gray-200 flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2 text-xs sm:text-base">
                     {row.icon} {row.label}
                   </h3>
                   {row.isLink && hasValue(s[row.key]) ? (
@@ -167,12 +175,12 @@ export default function CompareProgram() {
                       href={s[row.key]}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-300 underline text-xs sm:text-sm hover:text-blue-100 break-all font-Poppins"
+                      className="text-blue-300 underline text-xs sm:text-base hover:text-blue-100 break-all"
                     >
                       {new URL(s[row.key]).hostname.replace("www.", "")}
                     </a>
                   ) : (
-                    <span className="text-gray-300 text-xs sm:text-sm break-words font-Poppins">
+                    <span className="text-gray-300 text-xs sm:text-base break-words leading-relaxed">
                       {renderValue(s[row.key])}
                     </span>
                   )}
@@ -184,19 +192,25 @@ export default function CompareProgram() {
       </div>
 
       {/* Bottom Buttons */}
-      <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center flex-wrap">
+      <div className="mt-12 flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center flex-wrap">
         <button
           onClick={() => navigate("/results")}
-          className="!px-5 !py-2.5 sm:!px-8 sm:!py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-xs sm:text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out w-full sm:w-auto"
-          style={{ WebkitBackdropFilter: "blur(10px)", backdropFilter: "blur(10px)" }}
+          className="w-full sm:w-auto !px-6 sm:!px-10 !py-3 sm:!py-4 !rounded-full !bg-blue-800/30 !backdrop-blur-md !border !border-white/30 !text-white text-xs sm:text-base font-medium !shadow-lg hover:!bg-blue-800/40 transition duration-300 ease-in-out"
+          style={{
+            WebkitBackdropFilter: "blur(10px)",
+            backdropFilter: "blur(10px)",
+          }}
         >
           Back to Results
         </button>
 
         <button
           onClick={() => navigate("/Compare", { state: { selectedSchools } })}
-          className="!px-5 !py-2.5 sm:!px-8 sm:!py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-xs sm:text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out w-full sm:w-auto"
-          style={{ WebkitBackdropFilter: "blur(10px)", backdropFilter: "blur(10px)" }}
+          className="w-full sm:w-auto !px-6 sm:!px-10 !py-3 sm:!py-4 !rounded-full !bg-blue-800/30 !backdrop-blur-md !border !border-white/30 !text-white text-xs sm:text-base font-medium !shadow-lg hover:!bg-blue-800/40 transition duration-300 ease-in-out"
+          style={{
+            WebkitBackdropFilter: "blur(10px)",
+            backdropFilter: "blur(10px)",
+          }}
         >
           Schools Strength
         </button>

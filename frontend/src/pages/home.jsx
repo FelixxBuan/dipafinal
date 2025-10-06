@@ -42,9 +42,12 @@ function Home() {
       {/* Scroll container */}
       <div
   ref={scrollContainerRef}
-  className="h-screen overflow-y-scroll bg-gradient-to-tr from-[#0a0f2e] via-[#0d1a45] to-[#102a5c]
- text-white font-Poppins"
+  className="h-screen overflow-y-scroll bg-cover bg-center bg-no-repeat text-white font-Poppins"
+  style={{
+    backgroundImage: "url('/images/bg10.jpg')", // 👈 Replace with your image path
+  }}
 >
+
 
         {/* Hero Section */}
         <section className="h-screen flex flex-col justify-center px-3 sm:px-6 lg:px-8 relative z-10">
@@ -77,35 +80,74 @@ function Home() {
               </button>
             </div>
 
-            {/* Quick Stats */}
-<div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full max-w-4xl flex flex-wrap justify-center gap-6 sm:gap-36 text-center px-4">
+           {/* Quick Stats */}
+<div
+  className="absolute bottom-10 left-1/2 -translate-x-1/2 
+             w-full max-w-5xl flex flex-wrap justify-center 
+             gap-8 sm:gap-16 md:gap-32 text-center px-4
+             max-[400px]:gap-6 max-[350px]:gap-4"
+>
   {/* Programs */}
-  <div className="flex flex-col items-center flex-1 max-w-[90px] sm:max-w-none">
-    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-900/40 backdrop-blur-md flex items-center justify-center mb-1 sm:mb-2">
-      <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
+  <div
+    className="flex flex-col items-center flex-1 
+               max-w-[110px] sm:max-w-none 
+               scale-100 max-[400px]:scale-90 max-[350px]:scale-75"
+  >
+    <div
+      className="w-14 h-14 sm:w-16 sm:h-16 rounded-full 
+                 bg-blue-900/40 backdrop-blur-md flex items-center justify-center 
+                 mb-2 sm:mb-3"
+    >
+      <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 text-yellow-400" />
     </div>
-    <h3 className="text-xl sm:text-2xl font-extrabold text-yellow-400">50+</h3>
-    <span className="text-white/80 text-[10px] sm:text-xs">Programs Listed</span>
+    <h3 className="text-2xl sm:text-3xl font-extrabold text-yellow-400">
+      50+
+    </h3>
+    <span className="text-white/80 text-xs sm:text-sm max-[350px]:text-[10px]">
+      Programs Listed
+    </span>
   </div>
 
-  {/* Schools (Middle one stays the same) */}
-  <div className="flex flex-col items-center flex-1 max-w-[120px] sm:max-w-none">
-    <div className="w-12 h-12 rounded-full bg-blue-900/40 backdrop-blur-md flex items-center justify-center mb-2">
-      <Users className="w-6 h-6 text-blue-400" />
+  {/* Schools */}
+  <div
+    className="flex flex-col items-center flex-1 
+               max-w-[140px] sm:max-w-none 
+               scale-100 max-[400px]:scale-90 max-[350px]:scale-75"
+  >
+    <div
+      className="w-16 h-16 rounded-full bg-blue-900/40 backdrop-blur-md 
+                 flex items-center justify-center mb-3"
+    >
+      <Users className="w-8 h-8 text-blue-400" />
     </div>
-    <h3 className="text-2xl font-extrabold text-blue-400">Pampanga</h3>
-    <span className="text-white/80 text-xs sm:text-sm">Leading Schools</span>
+    <h3 className="text-3xl font-extrabold text-blue-400">Pampanga</h3>
+    <span className="text-white/80 text-sm sm:text-base max-[350px]:text-[11px]">
+      Leading Schools
+    </span>
   </div>
 
   {/* Time */}
-  <div className="flex flex-col items-center flex-1 max-w-[90px] sm:max-w-none">
-    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-900/40 backdrop-blur-md flex items-center justify-center mb-1 sm:mb-2">
-      <Check className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
+  <div
+    className="flex flex-col items-center flex-1 
+               max-w-[110px] sm:max-w-none 
+               scale-100 max-[400px]:scale-90 max-[350px]:scale-75"
+  >
+    <div
+      className="w-14 h-14 sm:w-16 sm:h-16 rounded-full 
+                 bg-blue-900/40 backdrop-blur-md flex items-center justify-center 
+                 mb-2 sm:mb-3"
+    >
+      <Check className="w-7 h-7 sm:w-8 sm:h-8 text-green-400" />
     </div>
-    <h3 className="text-xl sm:text-2xl font-extrabold text-green-400">1 min</h3>
-    <span className="text-white/80 text-[10px] sm:text-xs">Avg Completion</span>
+    <h3 className="text-2xl sm:text-3xl font-extrabold text-green-400">
+      1 min
+    </h3>
+    <span className="text-white/80 text-xs sm:text-sm max-[350px]:text-[10px]">
+      Avg Completion
+    </span>
   </div>
 </div>
+
 
 
 
