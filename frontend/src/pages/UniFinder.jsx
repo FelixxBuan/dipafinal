@@ -51,7 +51,7 @@ function UniFinder() {
     }))
   }
 
-  const allLocations = ["Angeles", "Apalit", "Bacolor", "Candaba", "Mabalacat", "Magalang", "Malolos", "Mexico", "Porac", "San Fernando"]
+  const allLocations = ["Angeles", "Apalit", "Bacolor", "Candaba", "Mabalacat", "Magalang", "Malolos, Bulacan", "Mexico", "Porac", "San Fernando"]
   const filteredLocations = schoolType === "private" ? ["Angeles", "San Fernando"] : allLocations
 
   const questions = [

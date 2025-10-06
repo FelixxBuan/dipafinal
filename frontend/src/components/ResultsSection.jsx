@@ -14,6 +14,8 @@ import {
   X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+
 
 
 // Leaflet + React-Leaflet imports
@@ -156,37 +158,55 @@ function ResultsSection({ results, message }) {
 
       <div className="pt-30 pb-4 px-4 w-full max-w-7xl mx-auto text-white">
 
+<div>
+  {!message && (
+    <div className="flex flex-col items-center mb-12 mt-12 text-center space-y-6 w-full px-4">
+      {/* Title */}
+      <h1
+        className="font-bold font-Merriweather text-white text-center w-full"
+        style={{
+          fontSize: "clamp(1.5rem, 5vw, 3rem)",
+          lineHeight: "clamp(2rem, 6vw, 3.5rem)",
+        }}
+      >
+        Top 10 Recommended Programs
+      </h1>
 
-    {/* Title Section */}
-<div className="flex flex-col items-center mb-12 mt-12 text-center space-y-6 w-full px-4">
-  {/* Title */}
-  <h1
-    className="font-bold font-Merriweather text-white text-center w-full"
-    style={{
-      fontSize: "clamp(1.5rem, 5vw, 3rem)",
-      lineHeight: "clamp(2rem, 6vw, 3.5rem)",
-    }}
-  >
-    Top 10 Recommended Programs
-  </h1>
-
-  {/* Disclaimer Container */}
-  <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-8 py-5 max-w-5xl w-full text-center">
-    <p className="text-xs sm:text-sm text-white/80">
-      ⚠️ Disclaimer: The results shown are recommendations based on your inputs and available school data. 
-      They are for reference only and should not replace official guidance from the institutions.
-    </p>
-  </div>
+      {/* Disclaimer */}
+      <div className="bg-yellow-500/20 backdrop-blur-md border border-yellow-400/40 rounded-xl px-8 py-4 max-w-4xl w-full text-center">
+        <p className="text-sm sm:text-base text-white/90">
+          ⚠️ Disclaimer: The results shown are recommendations based on your inputs and available school data. 
+          They are for reference only and should not replace official guidance from the institutions.
+        </p>
+      </div>
+    </div>
+  )}
 </div>
 
 
 
-
         {/* Main Results Section */}
-        <div className="space-y-6">
-          {message && (
-            <p className="text-center font-medium text-sm mb-4">{message}</p>
-          )}
+<div className="space-y-6">
+  {message && (
+    <div className="flex justify-center w-full mt-4 px-6">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="flex items-center justify-center gap-3 bg-red-600/20 
+                   border border-red-500/40 text-white rounded-2xl 
+                   px-10 py-3 text-sm sm:text-base font-medium 
+                   shadow-md backdrop-blur-md text-center 
+                   w-full max-w-4xl"
+      >
+        <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+        <span className="text-white/90">{message}</span>
+      </motion.div>
+    </div>
+  )}
+
+
+
 
           {results.map((item, index) => {
             const isExpanded = expandedIndex === index;

@@ -2,7 +2,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 import numpy as np
 
-from db import db  #shared DB connection
+from db import db  # shared DB connection
 
 # Load sentence transformer model
 model = SentenceTransformer("all-mpnet-base-v2")
@@ -120,12 +120,16 @@ def recommend(answers: dict, school_type: str = None, locations: list[str] = Non
     top_category = strong_matches[0].get("category") if strong_matches else None
     top_ranked_schools = rankings_data.get(top_category, [])[:5] if top_category else []
 
+    # Fallback if no strong matches
     if not strong_matches:
+        fallback_results = weak_matches[:6]  # suggest at least 6 programs
+        fallback_weak = weak_matches[6:12] if len(weak_matches) > 6 else []
+
         return {
             "type": "fallback",
-            "message": "We couldn't find a strong match for your interest, so here are a few programs you might explore.",
-            "results": weak_matches[:3],
-            "weak_matches": weak_matches[3:7],
+            "message": "We couldn't find a strong match for your interest, so here are a few programs you might explore or Click Try Again!",
+            "results": fallback_results,
+            "weak_matches": fallback_weak,
             "matched_category": top_category,
             "top_schools_for_category": top_ranked_schools
         }
