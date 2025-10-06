@@ -1,4 +1,5 @@
 import os
+import psutil
 from typing import List, Optional
 
 from dotenv import load_dotenv
@@ -9,6 +10,14 @@ from pydantic import BaseModel
 
 from backend.db import db  # ✅ shared DB connection
 from backend.recommendation import recommend
+
+def log_memory_usage(note=""):
+    process = psutil.Process(os.getpid())
+    mem_mb = process.memory_info().rss / 1024 / 1024
+    print(f"[MEMORY USAGE] {note} {mem_mb:.2f} MB")
+
+# Example: log at startup
+log_memory_usage("at startup")
 
 # Load env
 load_dotenv()
@@ -58,6 +67,7 @@ async def get_all_programs():
 
 @app.post("/search", summary="Get program recommendations based on user answers and filters")
 async def search(request_data: SearchRequest):
+    log_memory_usage("before recommend") 
     print("📥 Received search request")
     result = recommend(
         answers=request_data.answers,
@@ -65,6 +75,8 @@ async def search(request_data: SearchRequest):
         locations=request_data.locations,
         max_budget=request_data.max_budget,
     )
+    log_memory_usage("after recommend") 
+
     return result
 
 
