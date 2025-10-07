@@ -2,6 +2,18 @@ import PropTypes from "prop-types";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useEffect } from "react";
+import { useMap } from "react-leaflet";
+
+function ResizeMapOnShow() {
+  const map = useMap();
+  useEffect(() => {
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 300); // give the modal time to appear
+  }, [map]);
+  return null;
+}
 
 // Fix missing marker icons in Leaflet (needed for Vite + React)
 delete L.Icon.Default.prototype._getIconUrl;
