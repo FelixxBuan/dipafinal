@@ -102,9 +102,9 @@ function ResultsSection({ results, message }) {
       );
     }
   }, []);
-
+// `${import.meta.env.VITE_API_URL}/api/school-strengths`
   useEffect(() => {
-    fetch("http://localhost:8000/api/school-strengths")
+    fetch(`${import.meta.env.VITE_API_URL}/api/school-strengths`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();

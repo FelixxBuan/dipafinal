@@ -11,7 +11,7 @@ CATEGORY_WEIGHT = 0.3  # weight of the school rating in final score
 
 @lru_cache(maxsize=1)
 def get_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")
+    return SentenceTransformer("all-mpnet-base-v2")
 
 
 @lru_cache(maxsize=1)
