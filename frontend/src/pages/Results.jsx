@@ -20,18 +20,14 @@ function Results() {
   }, [navigate]);
 
   return (
-      <div
-  className="min-h-screen bg-cover bg-center bg-no-repeat text-white font-Poppins"
-  style={{
-    backgroundImage: "url('/images/bg20.jpg')",
-  }}
->
-
-      
-        
-        <ResultsSection results={results} message={message} />
-      </div>
-    
+    <div
+      className="min-h-screen bg-cover bg-center bg-no-repeat text-white font-Poppins"
+      style={{
+        backgroundImage: "url('/images/bg-home3.jpg')",
+      }}
+    >
+      <ResultsSection results={results} message={message} />
+    </div>
   );
 }
 

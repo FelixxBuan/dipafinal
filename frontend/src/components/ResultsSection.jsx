@@ -104,9 +104,9 @@ function ResultsSection({ results, message }) {
       );
     }
   }, []);
-// `${import.meta.env.VITE_API_URL}/api/school-strengths`
+
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/school-strengths`)
+    fetch("http://localhost:8000/api/school-strengths")
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
@@ -169,7 +169,7 @@ function ResultsSection({ results, message }) {
     lineHeight: "clamp(2rem, 6vw, 3.5rem)",
   }}
 >
-  Top 10 Recommended Programs
+  Featured Programs
 </h1>
 
 

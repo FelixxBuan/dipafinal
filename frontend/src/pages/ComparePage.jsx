@@ -91,12 +91,11 @@ export default function ComparePage() {
 
   return (
     <div
-  className="min-h-screen bg-cover bg-center bg-no-repeat text-white font-Poppins pt-32 px-4 pb-24"
-  style={{
-    backgroundImage: "url('/images/bg20.jpg')",
-  }}
->
-
+      className="min-h-screen bg-cover bg-center bg-no-repeat text-white font-Poppins pt-32 px-4 pb-24"
+      style={{
+        backgroundImage: "url('/images/bg-home3.jpg')",
+      }}
+    >
       {/* Navbar */}
       <Navbar />
 
@@ -167,7 +166,9 @@ export default function ComparePage() {
                             <p className="font-medium text-white font-Merriweather">
                               {spec.label}
                             </p>
-                            <p className="text-gray-300 font-Poppins">{value}</p>
+                            <p className="text-gray-300 font-Poppins">
+                              {value}
+                            </p>
                           </div>
                         </li>
                       );
@@ -184,7 +185,7 @@ export default function ComparePage() {
               onClick={() =>
                 navigate("/compare-program", { state: { selectedSchools } })
               }
-              className="!px-8 !py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out flex items-center"
+              className="!px-5 !py-2.5 sm:!px-8 sm:!py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-xs sm:text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out flex items-center w-full sm:w-auto"
               style={{
                 WebkitBackdropFilter: "blur(10px)",
                 backdropFilter: "blur(10px)",

@@ -39,13 +39,16 @@ function UniFinder() {
     setAnswers((prevAnswers) => {
       const selected = prevAnswers[questionKey];
       const isSelected = selected.includes(choice);
+
+      // If already selected, remove it
       if (isSelected) {
         return {
           ...prevAnswers,
           [questionKey]: selected.filter((item) => item !== choice),
         };
       } else {
-        if (selected.length >= 3) return prevAnswers;
+        // Limit to 2 choices only
+        if (selected.length >= 2) return prevAnswers;
         return {
           ...prevAnswers,
           [questionKey]: [...selected, choice],
@@ -68,7 +71,7 @@ function UniFinder() {
     "Candaba",
     "Mabalacat",
     "Magalang",
-    "Malolos",
+    "Malolos, Bulacan",
     "Mexico",
     "Porac",
     "San Fernando",
@@ -147,13 +150,14 @@ function UniFinder() {
     },
   ];
 
+  const apiBase = import.meta.env.VITE_API_URL || "https://subquadrangular-clotilde-supermathematically.ngrok-free.dev"
   const search = async () => {
     setLoading(true);
     const payload = { answers, school_type: schoolType, locations };
     if (schoolType === "private") payload.max_budget = maxBudget;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/search`, {
+      const response = await fetch(`${apiBase}/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -261,8 +265,10 @@ function UniFinder() {
     <>
       <Navbar />
       <div
-        className="min-h-screen bg-gradient-to-br from-[#020617] to-[#0a0f1f] 
-                px-4 text-white pt-16 sm:pt-20 lg:pt-36"
+        className="min-h-screen bg-cover bg-center bg-no-repeat px-4 text-white pt-16 sm:pt-20 lg:pt-36"
+        style={{
+          backgroundImage: "url('/images/bg-home3.jpg')",
+        }}
       >
         <div className="max-w-5xl mx-auto space-y-8">
           <ProgressBar />
@@ -272,31 +278,47 @@ function UniFinder() {
             <>
               {(() => {
                 const q = questions[currentQuestionIndex];
+
+                const hasSelectedChoices = answers[q.key].length > 0;
+                const hasTypedCustom = answers.custom[q.key].trim() !== "";
+
                 return (
                   <div
                     className="bg-blue-800/20 backdrop-blur-md 
-                        p-6 sm:p-8 md:p-10 
-                        rounded-2xl sm:rounded-3xl 
-                        border border-white/20 shadow-lg space-y-6 sm:space-y-8"
+                     p-6 sm:p-8 md:p-10 
+                     rounded-2xl sm:rounded-3xl 
+                     border border-white/20 shadow-lg space-y-6 sm:space-y-8"
                   >
-                    {/* Title */}
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="bg-blue-300/20 p-2 sm:p-3 rounded-md">
-                        <Heart className="text-blue-300 w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
+                    {/* Title and Subtitle */}
+                    <div className="flex flex-col gap-2 sm:gap-3">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="bg-blue-300/20 p-2 sm:p-3 rounded-md">
+                          <Heart className="text-blue-300 w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
+                        </div>
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold font-inter">
+                          {q.title}
+                        </h2>
                       </div>
-                      <h2 className="text-lg sm:text-xl md:text-2xl font-semibold font-inter">
-                        {q.title}
-                      </h2>
+
+                      {/* Subtitle / Instructions */}
+                      <p className="text-white font-poppins text-sm sm:text-base md:text-lg opacity-80 text-left">
+                        Choose up to 2 that best describe your interests, or
+                        type your own answers freely if none of the choices fit.
+                      </p>
                     </div>
 
                     {/* Choices */}
                     <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
                       {q.choices.map((choice) => {
                         const isSelected = answers[q.key].includes(choice);
+                        const isDisabled = hasTypedCustom; // disable if typing
+
                         return (
                           <div
                             key={choice}
-                            onClick={() => handleCheckboxChange(q.key, choice)}
+                            onClick={() =>
+                              !isDisabled && handleCheckboxChange(q.key, choice)
+                            }
                             className={`
                     px-3 py-1.5 sm:px-4 sm:py-2 
                     rounded-full text-sm sm:text-base md:text-lg 
@@ -305,7 +327,7 @@ function UniFinder() {
                       isSelected
                         ? "border-2 sm:border-4 border-white"
                         : "border border-blue-400 opacity-80 hover:opacity-100"
-                    } 
+                    }
                     bg-white/10 backdrop-blur-sm
                     text-white font-poppins
                     ${isDisabled ? "opacity-40 cursor-not-allowed" : ""}
@@ -321,14 +343,21 @@ function UniFinder() {
                     <input
                       type="text"
                       placeholder="Other (optional)..."
-                      className="mt-2 w-full border border-white/20 bg-white/10 
+                      className={`mt-2 w-full border border-white/20 bg-white/10 
                        rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 
                        text-xs sm:text-sm md:text-base 
-                       placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                       placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400
+                       ${
+                         hasSelectedChoices
+                           ? "opacity-40 cursor-not-allowed"
+                           : ""
+                       }`}
                       value={answers.custom[q.key]}
                       onChange={(e) =>
+                        !hasSelectedChoices &&
                         handleCustomChange(q.key, e.target.value)
                       }
+                      disabled={hasSelectedChoices} // disable input if choices picked
                     />
                   </div>
                 );
