@@ -37,7 +37,7 @@ export default function ComparePage() {
   );
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/school-strengths")
+    fetch(`${import.meta.env.VITE_API_URL}/api/school-strengths`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
@@ -181,19 +181,18 @@ export default function ComparePage() {
           {/* Back Button */}
           <div className="mt-10 flex justify-center">
             <button
-  onClick={() =>
-    navigate("/compare-program", { state: { selectedSchools } })
-  }
-  className="!px-5 !py-2.5 sm:!px-8 sm:!py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-xs sm:text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out flex items-center w-full sm:w-auto"
-  style={{
-    WebkitBackdropFilter: "blur(10px)",
-    backdropFilter: "blur(10px)",
-  }}
->
-  <ArrowLeft className="w-5 h-5 mr-2" />
-  Back
-</button>
-
+              onClick={() =>
+                navigate("/compare-program", { state: { selectedSchools } })
+              }
+              className="!px-8 !py-3 !rounded-full !bg-blue-800/20 !backdrop-blur-md !border !border-white/30 !text-white text-sm font-Poppins font-medium !shadow-lg hover:!bg-blue-800/30 transition duration-300 ease-in-out flex items-center"
+              style={{
+                WebkitBackdropFilter: "blur(10px)",
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back
+            </button>
           </div>
         </div>
       )}
