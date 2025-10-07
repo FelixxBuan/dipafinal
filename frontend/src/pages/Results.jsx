@@ -23,7 +23,7 @@ function Results() {
       <div
   className="min-h-screen bg-cover bg-center bg-no-repeat text-white font-Poppins"
   style={{
-    backgroundImage: "url('/images/bg10.jpg')",
+    backgroundImage: "url('/images/bg20.jpg')",
   }}
 >
 

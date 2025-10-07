@@ -182,7 +182,7 @@ const ProgressBar = () => {
     <div
   className="min-h-screen bg-cover bg-center bg-no-repeat px-4 text-white pt-16 sm:pt-20 lg:pt-36"
   style={{
-    backgroundImage: "url('/images/bg10.jpg')",
+    backgroundImage: "url('/images/bg20.jpg')",
   }}
 >
 
