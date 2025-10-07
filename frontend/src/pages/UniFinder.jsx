@@ -26,23 +26,27 @@ function UniFinder() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
 
   const handleCheckboxChange = (questionKey, choice) => {
-    setAnswers(prevAnswers => {
-      const selected = prevAnswers[questionKey];
-      const isSelected = selected.includes(choice);
-      if (isSelected) {
-        return {
-          ...prevAnswers,
-          [questionKey]: selected.filter(item => item !== choice)
-        };
-      } else {
-        if (selected.length >= 3) return prevAnswers;
-        return {
-          ...prevAnswers,
-          [questionKey]: [...selected, choice]
-        };
-      }
-    });
-  };
+  setAnswers(prevAnswers => {
+    const selected = prevAnswers[questionKey];
+    const isSelected = selected.includes(choice);
+
+    // If already selected, remove it
+    if (isSelected) {
+      return {
+        ...prevAnswers,
+        [questionKey]: selected.filter(item => item !== choice)
+      };
+    } else {
+      // Limit to 2 choices only
+      if (selected.length >= 2) return prevAnswers;
+      return {
+        ...prevAnswers,
+        [questionKey]: [...selected, choice]
+      };
+    }
+  });
+};
+
 
   const handleCustomChange = (category, value) => {
     setAnswers(prev => ({
@@ -197,43 +201,61 @@ const ProgressBar = () => {
 
           <ProgressBar />
 
-         {/* Step 1 */}
+        {/* Step 1 */}
 {step === 1 && (
   <>
     {(() => {
-      const q = questions[currentQuestionIndex]
+      const q = questions[currentQuestionIndex];
+
+      const hasSelectedChoices = answers[q.key].length > 0;
+      const hasTypedCustom = answers.custom[q.key].trim() !== "";
+
       return (
-        <div className="bg-blue-800/20 backdrop-blur-md 
-                        p-6 sm:p-8 md:p-10 
-                        rounded-2xl sm:rounded-3xl 
-                        border border-white/20 shadow-lg space-y-6 sm:space-y-8">
-          {/* Title */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="bg-blue-300/20 p-2 sm:p-3 rounded-md">
-              <Heart className="text-blue-300 w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
+        <div
+          className="bg-blue-800/20 backdrop-blur-md 
+                     p-6 sm:p-8 md:p-10 
+                     rounded-2xl sm:rounded-3xl 
+                     border border-white/20 shadow-lg space-y-6 sm:space-y-8"
+        >
+          {/* Title and Subtitle */}
+          <div className="flex flex-col gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="bg-blue-300/20 p-2 sm:p-3 rounded-md">
+                <Heart className="text-blue-300 w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
+              </div>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold font-inter">
+                {q.title}
+              </h2>
             </div>
-            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold font-inter">
-              {q.title}
-            </h2>
+
+            {/* Subtitle / Instructions */}
+            <p className="text-white font-poppins text-sm sm:text-base md:text-lg opacity-80 text-left">
+              Choose up to 2 that best describe your interests, or type your own answers freely if none of the choices fit.
+            </p>
           </div>
 
           {/* Choices */}
           <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
             {q.choices.map((choice) => {
               const isSelected = answers[q.key].includes(choice);
+              const isDisabled = hasTypedCustom; // disable if typing
+
               return (
                 <div
                   key={choice}
-                  onClick={() => handleCheckboxChange(q.key, choice)}
+                  onClick={() =>
+                    !isDisabled && handleCheckboxChange(q.key, choice)
+                  }
                   className={`
                     px-3 py-1.5 sm:px-4 sm:py-2 
                     rounded-full text-sm sm:text-base md:text-lg 
                     font-medium cursor-pointer transition
-                    ${isSelected 
-                      ? "border-2 sm:border-4 border-white" 
-                      : "border border-blue-400 opacity-80 hover:opacity-100"} 
+                    ${isSelected
+                      ? "border-2 sm:border-4 border-white"
+                      : "border border-blue-400 opacity-80 hover:opacity-100"}
                     bg-white/10 backdrop-blur-sm
                     text-white font-poppins
+                    ${isDisabled ? "opacity-40 cursor-not-allowed" : ""}
                   `}
                 >
                   {choice}
@@ -246,15 +268,19 @@ const ProgressBar = () => {
           <input
             type="text"
             placeholder="Other (optional)..."
-            className="mt-2 w-full border border-white/20 bg-white/10 
+            className={`mt-2 w-full border border-white/20 bg-white/10 
                        rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 
                        text-xs sm:text-sm md:text-base 
-                       placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                       placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400
+                       ${hasSelectedChoices ? "opacity-40 cursor-not-allowed" : ""}`}
             value={answers.custom[q.key]}
-            onChange={(e) => handleCustomChange(q.key, e.target.value)}
+            onChange={(e) =>
+              !hasSelectedChoices && handleCustomChange(q.key, e.target.value)
+            }
+            disabled={hasSelectedChoices} // disable input if choices picked
           />
         </div>
-      )
+      );
     })()}
 
     {/* Buttons */}
@@ -272,7 +298,9 @@ const ProgressBar = () => {
         >
           Back
         </button>
-      ) : <span></span>}
+      ) : (
+        <span></span>
+      )}
 
       {currentQuestionIndex < questions.length - 1 ? (
         <button
@@ -308,6 +336,8 @@ const ProgressBar = () => {
     </div>
   </>
 )}
+
+
 
 
 {/* Step 2 */}
