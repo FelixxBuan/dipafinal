@@ -3,14 +3,25 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.eggs/
+
+# Virtual environments
 *.env
 *.venv
 venv/
 ENV/
 env/
-pip-log.txt
 
-# === Node.js ===
+# Pip
+pip-log.txt
+pip-wheel-metadata/
+*.whl
+
+# === Node.js (if mixed frontend/backend in same repo) ===
 node_modules/
 npm-debug.log*
 yarn-debug.log*
@@ -28,9 +39,9 @@ Thumbs.db
 desktop.ini
 
 # === Docker related ===
-*.env
 docker-compose.override.yml
 .env.*
+.dockerignore
 
 # === Dev Containers (if VS Code created one) ===
 .devcontainer/
@@ -40,7 +51,7 @@ devcontainers/
 logs/
 *.log
 
-# === Build output ===
+# === Build output / Archives ===
 *.tar
 *.gz
 *.zip
@@ -51,3 +62,8 @@ logs/
 *.bak
 *.tmp
 *.~*
+
+# === Render specific ===
+# Don’t upload sentence-transformers model cache
+cache/
+huggingface/

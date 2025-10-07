@@ -20,11 +20,13 @@ function Results() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-blue-700 mb-6">Recommended Programs</h1>
-        <ResultsSection results={results} message={message} />
-      </div>
+    <div
+      className="min-h-screen bg-cover bg-center bg-no-repeat text-white font-Poppins"
+      style={{
+        backgroundImage: "url('/images/bg-home3.jpg')",
+      }}
+    >
+      <ResultsSection results={results} message={message} />
     </div>
   );
 }

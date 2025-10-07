@@ -1,358 +1,537 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { Heart, MapPin, DollarSign, School, Search } from "lucide-react"
-import Navbar from "../components/navbar"
-import Footer from "../components/Footer"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Heart,
+  MapPin,
+  DollarSign,
+  School,
+  Search,
+  HelpCircle,
+} from "lucide-react";
+import Navbar from "../components/Navbar";
 
 function UniFinder() {
-  const [step, setStep] = useState(1)
-  const navigate = useNavigate()
+  const [step, setStep] = useState(1);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const [answers, setAnswers] = useState({
-    subjects: [],
+    academics: [],
     fields: [],
     activities: [],
-    skills: [],
-    tools: [],
-    workStyle: [],
-    impact: [],
+    goals: [],
+    environment: [],
     custom: {
-      subjects: "", fields: "", activities: "", skills: "", tools: "", workStyle: "", impact: "",
-    }
-  })
+      academics: "",
+      fields: "",
+      activities: "",
+      goals: "",
+      environment: "",
+    },
+  });
 
-  const [schoolType, setSchoolType] = useState("any")
-  const [locations, setLocations] = useState([])
-  const [maxBudget, setMaxBudget] = useState(50000)
+  const [schoolType, setSchoolType] = useState("any");
+  const [locations, setLocations] = useState([]);
+  const [maxBudget, setMaxBudget] = useState(50000);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  const handleCheckboxChange = (category, value) => {
-    setAnswers(prev => {
-      const updated = prev[category].includes(value)
-        ? prev[category].filter(item => item !== value)
-        : [...prev[category], value]
-      return { ...prev, [category]: updated }
-    })
-  }
+  const handleCheckboxChange = (questionKey, choice) => {
+    setAnswers((prevAnswers) => {
+      const selected = prevAnswers[questionKey];
+      const isSelected = selected.includes(choice);
+
+      // If already selected, remove it
+      if (isSelected) {
+        return {
+          ...prevAnswers,
+          [questionKey]: selected.filter((item) => item !== choice),
+        };
+      } else {
+        // Limit to 2 choices only
+        if (selected.length >= 2) return prevAnswers;
+        return {
+          ...prevAnswers,
+          [questionKey]: [...selected, choice],
+        };
+      }
+    });
+  };
 
   const handleCustomChange = (category, value) => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
-      custom: { ...prev.custom, [category]: value }
-    }))
-  }
+      custom: { ...prev.custom, [category]: value },
+    }));
+  };
 
-  const allLocations = ["Angeles", "Apalit", "Bacolor", "Candaba", "Mabalacat", "Magalang", "Malolos", "Mexico", "Porac", "San Fernando"]
-  const filteredLocations = schoolType === "private" ? ["Angeles", "San Fernando"] : allLocations
+  const allLocations = [
+    "Angeles",
+    "Apalit",
+    "Bacolor",
+    "Candaba",
+    "Mabalacat",
+    "Magalang",
+    "Malolos, Bulacan",
+    "Mexico",
+    "Porac",
+    "San Fernando",
+  ];
+  const filteredLocations =
+    schoolType === "private" ? ["Angeles", "San Fernando"] : allLocations;
 
- const questions = [
-  {
-    key: "subjects",
-    title: "What subjects do you enjoy the most?",
-    choices: [
-      "Math",
-      "Science",
-      "English",
-      "History",
-      "PE",
-      "Arts",
-      "Foreign Languages",
-      "Economics",
-      "Information and Communication Technology (ICT)"
-    ]
-  },
-  {
-    key: "fields",
-    title: "What topics or fields are you most interested in?",
-    choices: [
-      "Technology",
-      "Arts",
-      "Healthcare",
-      "Engineering",
-      "Law",
-      "Education",
-      "Business",
-      "Social Sciences",
-      "Environmental Science"
-    ]
-  },
-  {
-    key: "activities",
-    title: "What kind of activities do you enjoy?",
-    choices: [
-      "Designing",
-      "Solving problems",
-      "Building things",
-      "Writing",
-      "Researching",
-      "Presenting",
-      "Organizing events",
-      "Helping others",
-      "Experimenting"
-    ]
-  },
-  {
-    key: "skills",
-    title: "What skills do you have or want to improve?",
-    choices: [
-      "Critical thinking",
-      "Creativity",
-      "Communication",
-      "Coding",
-      "Leadership",
-      "Problem-solving",
-      "Analytical thinking",
-      "Public speaking",
-      "Collaboration"
-    ]
-  },
-  {
-    key: "tools",
-    title: "Which tools or environments are you comfortable working with?",
-    choices: [
-      "Computers",
-      "Books",
-      "Lab equipment",
-      "Art materials",
-      "Multimedia tools",
-      "Spreadsheets",
-      "Software applications",
-      "Cameras",
-      "Technical instruments"
-    ]
-  },
-  {
-    key: "workStyle",
-    title: "Do you prefer working alone or with others?",
-    choices: [
-      "Solo tasks",
-      "Teamwork",
-      "Public speaking",
-      "Leadership",
-      "Mentoring",
-      "Collaborative projects",
-      "Field work",
-      "Online/remote tasks",
-      "Hands-on work"
-    ]
-  },
-  {
-    key: "impact",
-    title: "What kind of impact do you want to make in the world?",
-    choices: [
-      "Helping people",
-      "Innovating technology",
-      "Protecting the environment",
-      "Educating others",
-      "Promoting justice",
-      "Supporting communities",
-      "Improving healthcare",
-      "Advancing science",
-      "Driving economic growth"
-    ]
-  }
-];
+  const questions = [
+    {
+      key: "academics",
+      title: "Which school subjects or learning areas excite you the most?",
+      choices: [
+        "Math",
+        "Science",
+        "English",
+        "History/Social Studies",
+        "Physical Education",
+        "Arts & Design",
+        "Technology/ICT",
+      ],
+    },
+    {
+      key: "fields",
+      title:
+        "Which career industries or professional fields interest you most?",
+      choices: [
+        "Engineering",
+        "Architecture",
+        "Arts & Media",
+        "Healthcare",
+        "Education",
+        "Community & Social Work",
+        "Law & Governance",
+        "Information Technology",
+      ],
+    },
+    {
+      key: "activities",
+      title: "What types of tasks do you naturally enjoy or excel at?",
+      choices: [
+        "Designing/Creating",
+        "Solving complex problems",
+        "Writing/Storytelling",
+        "Hands-on building/Repairing",
+        "Guiding/Mentoring others",
+        "Researching/Analyzing",
+        "Presenting/Speaking",
+      ],
+    },
+    {
+      key: "goals",
+      title: "What outcomes or achievements matter most in your future career?",
+      choices: [
+        "Improving lives",
+        "Driving innovation",
+        "Educating others",
+        "Growing a business",
+        "Promoting fairness & justice",
+        "Protecting the environment",
+        "Mastering expertise in a field",
+      ],
+    },
+    {
+      key: "environment",
+      title:
+        "What kind of workplace or setting do you see yourself thriving in?",
+      choices: [
+        "Corporate office",
+        "Academic institution",
+        "Hospital or clinic",
+        "Outdoor/nature setting",
+        "Workshop or laboratory",
+        "Creative studio",
+        "Tech-driven workspace",
+      ],
+    },
+  ];
 
-
+  const apiBase = import.meta.env.VITE_API_URL || "https://subquadrangular-clotilde-supermathematically.ngrok-free.dev"
   const search = async () => {
-    const payload = {
-      answers,
-      school_type: schoolType,
-      locations,
+    setLoading(true);
+    const payload = { answers, school_type: schoolType, locations };
+    if (schoolType === "private") payload.max_budget = maxBudget;
+
+    try {
+      const response = await fetch(`${apiBase}/search`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      localStorage.setItem("results", JSON.stringify(data.results || []));
+      localStorage.setItem("message", data.message || "");
+      localStorage.setItem("type", data.type || "exact");
+
+      navigate("/results");
+    } catch (error) {
+      console.error("Error fetching results:", error);
+    } finally {
+      setLoading(false);
     }
-
-    if (schoolType === "private") {
-      payload.max_budget = maxBudget
-    }
-
-    const response = await fetch("http://127.0.0.1:8000/search", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    })
-
-    const data = await response.json()
-    localStorage.setItem("results", JSON.stringify(data.results || []))
-    localStorage.setItem("message", data.message || "")
-    navigate("/results")
-  }
+  };
 
   const ProgressBar = () => {
-  const steps = [1, 2, 3]
+    const steps = [
+      {
+        id: 1,
+        label: "Questions",
+        icon: <HelpCircle size={24} className="text-red-400" />,
+      },
+      {
+        id: 2,
+        label: "School Type",
+        icon: <School size={24} className="text-green-400" />,
+      },
+      {
+        id: 3,
+        label: "Location",
+        icon: <MapPin size={24} className="text-yellow-400" />,
+      },
+    ];
 
-  return (
-    <div className="w-full mb-10 px-2">
-      {/* Bar Container */}
-      <div className="relative flex items-center justify-between">
-        {/* Background Line */}
-        <div className="absolute top-1/2 left-0 w-full h-3 bg-green-200 rounded-full -translate-y-1/2 z-0" />
+    let progressPercent = 0;
 
-        {/* Foreground Line (Progress) */}
-        <div
-          className="absolute top-1/2 left-0 h-3 bg-gradient-to-r from-green-400 to-green-600 rounded-full z-10 transition-all duration-500 ease-in-out"
-          style={{
-            width: `${((step - 1) / (steps.length - 1)) * 100}%`,
-            transform: "translateY(-50%)",
-          }}
-        />
+    if (step === 1) {
+      if (currentQuestionIndex === 0) {
+        progressPercent = 0;
+      } else {
+        progressPercent =
+          (currentQuestionIndex / (questions.length - 1)) *
+          (100 / (steps.length - 1));
+      }
+    } else if (step === 2) {
+      progressPercent = 100 / (steps.length - 1);
+    } else if (step === 3) {
+      progressPercent = 100;
+    }
 
-        {/* Step Circles */}
-        {steps.map((s) => {
-          const isCompleted = step > s
-          const isCurrent = step === s
+    return (
+      <div className="w-full max-w-3xl mx-auto mt-12">
+        <div className="relative flex items-center justify-between px-4">
+          {/* Background Line */}
+          <div className="absolute left-14 right-14 top-1/2 -translate-y-1/2 -mt-[8px] h-[6px] bg-blue-900 rounded-full" />
 
-          return (
-            <div key={s} className="relative z-20">
+          {/* Progress Line */}
+          <div
+            className="absolute left-14 top-1/2 -translate-y-1/2 -mt-[8px] h-[6px] bg-blue-400 rounded-full shadow-[0_0_20px_4px_rgba(59,130,246,0.8)] transition-all duration-500"
+            style={{
+              width: `calc((100% - 7rem) * ${progressPercent / 100})`,
+            }}
+          />
+
+          {/* Circles */}
+          {steps.map((s) => {
+            let extraGlow = "";
+            if (s.id === 2 && step === 1 && currentQuestionIndex > 0) {
+              const progressToStep2 =
+                currentQuestionIndex / (questions.length - 1);
+              extraGlow = `shadow-[0_0_${10 + progressToStep2 * 20}px_${
+                2 + progressToStep2 * 4
+              }px_rgba(59,130,246,${0.3 + progressToStep2 * 0.5})]`;
+            }
+
+            return (
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 ease-in-out
-                  ${isCompleted
-                    ? "bg-green-500 text-white"
-                    : isCurrent
-                      ? "bg-white border-[4px] border-green-500 text-green-700 shadow-lg"
-                      : "bg-white border-[2px] border-green-300 text-gray-500"
-                  }`}
+                key={s.id}
+                className="flex flex-col items-center relative z-10"
               >
-                {s}
+                <div
+                  className={`w-14 h-14 flex items-center justify-center rounded-full border-2 transition-all duration-500
+                  bg-blue-800/20 backdrop-blur-md
+                  ${
+                    s.id === step || s.id < step
+                      ? "border-blue-400"
+                      : "border-white/20"
+                  } ${extraGlow}`}
+                >
+                  {s.icon}
+                </div>
+                <span className="mt-3 text-sm text-white">{s.label}</span>
               </div>
-            </div>
-          )
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
-  )
-}
-
+    );
+  };
 
   return (
     <>
       <Navbar />
-
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-10 px-4">
+      <div
+        className="min-h-screen bg-cover bg-center bg-no-repeat px-4 text-white pt-16 sm:pt-20 lg:pt-36"
+        style={{
+          backgroundImage: "url('/images/bg-home3.jpg')",
+        }}
+      >
         <div className="max-w-5xl mx-auto space-y-8">
-
-          {/* Progress Bar */}
           <ProgressBar />
 
-          {/* Note Section */}
-          <div className="border-l-4 border-yellow-400 bg-yellow-50 p-4 rounded-xl shadow-sm text-gray-800">
-            <p className="text-sm md:text-base">
-              <strong>Note:</strong> All the recommendations you see are based on what you share with us — your interests, preferences, and goals.
-            </p>
-          </div>
-
-          {/* Step 1: Questions */}
+          {/* Step 1 */}
           {step === 1 && (
             <>
-              {questions.map((q) => (
-                <div key={q.key} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-pink-100 p-2 rounded-md">
-                      <Heart className="text-pink-600 w-5 h-5" />
-                    </div>
-                    <h2 className="text-lg font-medium text-gray-800">{q.title}</h2>
-                  </div>
+              {(() => {
+                const q = questions[currentQuestionIndex];
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {q.choices.map((choice) => (
-                      <label key={choice} className="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                        <div className="relative">
-                          <input
-                            type="checkbox"
-                            className="peer appearance-none h-5 w-5 border-2 border-pink-400 rounded-sm checked:bg-pink-500 checked:border-pink-500 focus:ring-2 focus:ring-pink-400 transition"
-                            checked={answers[q.key].includes(choice)}
-                            onChange={() => handleCheckboxChange(q.key, choice)}
-                          />
-                          <div className="pointer-events-none absolute top-0 left-0 h-5 w-5 flex items-center justify-center text-white text-xs font-bold peer-checked:opacity-100 opacity-0">
-                            ✓
-                          </div>
+                const hasSelectedChoices = answers[q.key].length > 0;
+                const hasTypedCustom = answers.custom[q.key].trim() !== "";
+
+                return (
+                  <div
+                    className="bg-blue-800/20 backdrop-blur-md 
+                     p-6 sm:p-8 md:p-10 
+                     rounded-2xl sm:rounded-3xl 
+                     border border-white/20 shadow-lg space-y-6 sm:space-y-8"
+                  >
+                    {/* Title and Subtitle */}
+                    <div className="flex flex-col gap-2 sm:gap-3">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="bg-blue-300/20 p-2 sm:p-3 rounded-md">
+                          <Heart className="text-blue-300 w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
                         </div>
-                        <span>{choice}</span>
-                      </label>
-                    ))}
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold font-inter">
+                          {q.title}
+                        </h2>
+                      </div>
+
+                      {/* Subtitle / Instructions */}
+                      <p className="text-white font-poppins text-sm sm:text-base md:text-lg opacity-80 text-left">
+                        Choose up to 2 that best describe your interests, or
+                        type your own answers freely if none of the choices fit.
+                      </p>
+                    </div>
+
+                    {/* Choices */}
+                    <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
+                      {q.choices.map((choice) => {
+                        const isSelected = answers[q.key].includes(choice);
+                        const isDisabled = hasTypedCustom; // disable if typing
+
+                        return (
+                          <div
+                            key={choice}
+                            onClick={() =>
+                              !isDisabled && handleCheckboxChange(q.key, choice)
+                            }
+                            className={`
+                    px-3 py-1.5 sm:px-4 sm:py-2 
+                    rounded-full text-sm sm:text-base md:text-lg 
+                    font-medium cursor-pointer transition
+                    ${
+                      isSelected
+                        ? "border-2 sm:border-4 border-white"
+                        : "border border-blue-400 opacity-80 hover:opacity-100"
+                    }
+                    bg-white/10 backdrop-blur-sm
+                    text-white font-poppins
+                    ${isDisabled ? "opacity-40 cursor-not-allowed" : ""}
+                  `}
+                          >
+                            {choice}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Custom Input */}
+                    <input
+                      type="text"
+                      placeholder="Other (optional)..."
+                      className={`mt-2 w-full border border-white/20 bg-white/10 
+                       rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 
+                       text-xs sm:text-sm md:text-base 
+                       placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400
+                       ${
+                         hasSelectedChoices
+                           ? "opacity-40 cursor-not-allowed"
+                           : ""
+                       }`}
+                      value={answers.custom[q.key]}
+                      onChange={(e) =>
+                        !hasSelectedChoices &&
+                        handleCustomChange(q.key, e.target.value)
+                      }
+                      disabled={hasSelectedChoices} // disable input if choices picked
+                    />
                   </div>
+                );
+              })()}
 
-                  <input
-                    type="text"
-                    placeholder="Other (optional)..."
-                    className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-2 text-sm bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                    value={answers.custom[q.key]}
-                    onChange={(e) => handleCustomChange(q.key, e.target.value)}
-                  />
-                </div>
-              ))}
+              {/* Buttons */}
+              <div className="flex justify-between mt-4">
+                {currentQuestionIndex > 0 ? (
+                  <button
+                    className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 
+                     rounded-lg sm:rounded-xl 
+                     text-sm sm:text-base md:text-lg 
+                     font-poppins text-white 
+                     border border-white/20 backdrop-blur-sm transition
+                     hover:border-blue-300"
+                    style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                    onClick={() =>
+                      setCurrentQuestionIndex(currentQuestionIndex - 1)
+                    }
+                  >
+                    Back
+                  </button>
+                ) : (
+                  <span></span>
+                )}
 
-              <div className="text-right">
-                <button
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-base font-medium shadow transition"
-                  onClick={() => setStep(2)}
-                >
-                  Next
-                </button>
+                {currentQuestionIndex < questions.length - 1 ? (
+                  <button
+                    className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 
+                     rounded-lg sm:rounded-xl 
+                     text-sm sm:text-base md:text-lg 
+                     font-poppins font-medium text-white 
+                     border border-white/20 backdrop-blur-sm transition
+                     hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                    disabled={
+                      answers[questions[currentQuestionIndex].key].length ===
+                        0 &&
+                      answers.custom[
+                        questions[currentQuestionIndex].key
+                      ].trim() === ""
+                    }
+                    onClick={() =>
+                      setCurrentQuestionIndex(currentQuestionIndex + 1)
+                    }
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 
+                     rounded-lg sm:rounded-xl 
+                     text-sm sm:text-base md:text-lg 
+                     font-poppins font-medium text-white 
+                     border border-white/20 backdrop-blur-sm transition
+                     hover:border-blue-300"
+                    style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                    onClick={() => setStep(2)}
+                  >
+                    Continue
+                  </button>
+                )}
               </div>
             </>
           )}
 
-          {/* Step 2: School type & budget */}
+          {/* Step 2 */}
           {step === 2 && (
             <>
-              <div className="border-2 rounded-xl bg-white shadow-sm p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <School className="text-blue-600" />
+              {/* School Type Card */}
+              <div
+                className="bg-blue-800/20 backdrop-blur-md border border-white/20 
+                    rounded-lg sm:rounded-xl shadow-lg 
+                    p-5 sm:p-6 md:p-8 max-w-3xl mx-auto"
+              >
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <div className="bg-blue-400/20 p-2 sm:p-2.5 rounded-lg">
+                    <School className="text-blue-300 w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-semibold text-gray-800">Preferred School Type</h2>
-                    <p className="text-sm text-gray-600">Choose which type of school you prefer</p>
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold font-inter">
+                      Preferred School Type
+                    </h2>
+                    <p className="text-xs sm:text-sm md:text-base text-blue-100 font-poppins">
+                      Choose which type of school you prefer
+                    </p>
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                {/* Options */}
+                <div className="space-y-2 sm:space-y-3">
                   {[
-                    { value: "public", label: "Public Schools", desc: "State-funded, affordable options" },
-                    { value: "private", label: "Private Schools", desc: "Privately-run with more variety" },
-                    { value: "any", label: "Both Types", desc: "I'm open to all options" },
+                    {
+                      value: "public",
+                      label: "Public Schools",
+                      desc: "State-funded, affordable options",
+                    },
+                    {
+                      value: "private",
+                      label: "Private Schools",
+                      desc: "Privately-run with more variety",
+                    },
+                    {
+                      value: "any",
+                      label: "Both Types",
+                      desc: "I'm open to all options",
+                    },
                   ].map(({ value, label, desc }) => (
-                    <label key={value} className={`flex items-start gap-3 p-4 rounded-lg border transition cursor-pointer ${schoolType === value ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-300"}`}>
-                      <span className="relative w-5 h-5">
-                        <input
-                          type="radio"
-                          name="schoolType"
-                          value={value}
-                          checked={schoolType === value}
-                          onChange={(e) => {
-                            const selected = e.target.value
-                            setSchoolType(selected)
-                            if (selected === "private") {
-                              setLocations(prev => prev.filter(loc => ["Angeles", "San Fernando"].includes(loc)))
-                            }
-                          }}
-                          className="absolute w-5 h-5 opacity-0 cursor-pointer"
-                        />
-                        <span className={`w-5 h-5 rounded-full border-2 transition-all duration-200 ${schoolType === value ? "bg-blue-600 border-blue-600" : "bg-transparent border-gray-300"}`} />
-                      </span>
-
+                    <label
+                      key={value}
+                      className={`flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg border transition cursor-pointer 
+                text-sm sm:text-base
+                ${
+                  schoolType === value
+                    ? "border-2 sm:border-4 border-blue-400 bg-blue-500/20"
+                    : "border border-white/20 hover:border-blue-300"
+                }`}
+                    >
+                      <input
+                        type="radio"
+                        name="schoolType"
+                        value={value}
+                        checked={schoolType === value}
+                        onChange={(e) => {
+                          const selected = e.target.value;
+                          setSchoolType(selected);
+                          if (selected === "private") {
+                            setLocations((prev) =>
+                              prev.filter((loc) =>
+                                ["Angeles", "San Fernando"].includes(loc)
+                              )
+                            );
+                          }
+                        }}
+                        className="w-4 h-4 sm:w-5 sm:h-5 opacity-0 cursor-pointer"
+                      />
                       <div>
-                        <span className="font-medium text-gray-800">{label}</span>
-                        <p className="text-sm text-gray-600">{desc}</p>
+                        <span className="font-semibold font-poppins">
+                          {label}
+                        </span>
+                        <p className="text-xs sm:text-sm text-blue-100 font-poppins">
+                          {desc}
+                        </p>
                       </div>
                     </label>
                   ))}
                 </div>
               </div>
 
+              {/* Tuition Budget (Only for private) */}
               {schoolType === "private" && (
-                <div className="border-2 border-green-200 bg-green-50/60 rounded-xl p-6 shadow-sm">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-green-100 p-2 rounded-lg">
-                      <DollarSign className="text-green-600" />
+                <div
+                  className="bg-blue-800/20 backdrop-blur-md border border-white/20 
+                      rounded-lg sm:rounded-xl shadow-lg 
+                      p-5 sm:p-6 md:p-8 max-w-3xl mx-auto mt-4 sm:mt-5"
+                >
+                  <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                    <div className="bg-blue-300/20 p-2 sm:p-2.5 rounded-lg">
+                      <DollarSign className="text-blue-300 w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-semibold text-gray-800">Maximum Tuition</h2>
-                      <p className="text-sm text-gray-600">Set your budget per semester</p>
+                      <h2 className="text-lg sm:text-xl md:text-2xl font-semibold font-inter">
+                        Maximum Tuition
+                      </h2>
+                      <p className="text-xs sm:text-sm md:text-base text-blue-100 font-poppins">
+                        Set your budget per semester
+                      </p>
                     </div>
                   </div>
-                  <label className="block text-gray-700 font-medium mb-2">
+
+                  <label className="block text-xs sm:text-sm md:text-base text-blue-100 font-medium mb-1 sm:mb-2 font-poppins">
                     Selected: ₱{maxBudget.toLocaleString()}
                   </label>
+
                   <input
                     type="range"
                     min={5000}
@@ -360,71 +539,147 @@ function UniFinder() {
                     step={1000}
                     value={maxBudget}
                     onChange={(e) => setMaxBudget(Number(e.target.value))}
-                    className="w-full accent-green-600"
+                    className="w-full accent-blue-400"
                   />
-                  <div className="flex justify-between text-sm text-gray-600 mt-1">
-                    <span>₱5,000</span><span>₱50,000</span><span>₱100,000</span>
+
+                  <div className="flex justify-between text-[10px] sm:text-sm text-blue-200 mt-1 sm:mt-2 font-poppins">
+                    <span>₱5,000</span>
+                    <span>₱50,000</span>
+                    <span>₱100,000</span>
                   </div>
                 </div>
               )}
 
-              <div className="flex justify-between pt-4">
-                <button className="text-sm text-blue-700 hover:underline" onClick={() => setStep(1)}>← Back</button>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-base font-medium shadow transition" onClick={() => setStep(3)}>Next</button>
+              {/* Buttons */}
+              <div className="flex justify-between mt-4 sm:mt-5 pb-5 sm:pb-6 max-w-3xl mx-auto">
+                <button
+                  className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 
+                   rounded-lg sm:rounded-xl 
+                   text-sm sm:text-base md:text-lg 
+                   font-poppins text-white 
+                   border border-white/20 backdrop-blur-sm transition
+                   hover:border-blue-300"
+                  style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                  onClick={() => setStep(1)}
+                >
+                  Back
+                </button>
+
+                <button
+                  className="px-4 py-2 sm:px-6 sm:py-3 md:px-7 md:py-3.5 
+                   rounded-lg sm:rounded-xl 
+                   text-sm sm:text-base md:text-lg 
+                   font-poppins font-medium text-white 
+                   border border-white/20 backdrop-blur-sm transition
+                   hover:border-blue-300"
+                  style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                  onClick={() => setStep(3)}
+                >
+                  Next
+                </button>
               </div>
             </>
           )}
 
-          {/* Step 3: Location + Submit */}
+          {/* Step 3 */}
           {step === 3 && (
             <>
-              <div className="border-2 rounded-xl bg-white shadow-sm hover:shadow-md transition p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="bg-purple-100 p-2 rounded-lg">
-                    <MapPin className="text-purple-600" />
+              <div
+                className="bg-blue-800/20 backdrop-blur-md border border-white/20 
+                    rounded-xl sm:rounded-2xl shadow-lg 
+                    p-6 sm:p-8 md:p-10"
+              >
+                {/* Title */}
+                <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                  <div className="bg-blue-300/20 p-2 sm:p-3 rounded-lg">
+                    <MapPin className="text-blue-300 w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-semibold text-gray-800">Preferred Locations</h2>
-                    <p className="text-base text-gray-600">Choose cities in Pampanga where you'd like to study</p>
+                    <h2 className="text-lg sm:text-2xl md:text-3xl font-semibold font-inter">
+                      Preferred Locations
+                    </h2>
+                    <p className="text-xs sm:text-sm md:text-base text-blue-100 font-inter">
+                      Choose cities in Pampanga where you'd like to study
+                    </p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-4 text-base text-gray-800">
-                  {filteredLocations.map((loc) => (
-                    <label key={loc} className="flex items-center gap-3 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        value={loc}
-                        checked={locations.includes(loc)}
-                        onChange={(e) => {
-                          const checked = e.target.checked
+                {/* Location pills */}
+                <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
+                  {filteredLocations.map((loc) => {
+                    const isSelected = locations.includes(loc);
+                    return (
+                      <div
+                        key={loc}
+                        onClick={() => {
                           setLocations((prev) =>
-                            checked ? [...prev, loc] : prev.filter((l) => l !== loc)
-                          )
+                            isSelected
+                              ? prev.filter((l) => l !== loc)
+                              : [...prev, loc]
+                          );
                         }}
-                        className="w-5 h-5 rounded border-2 border-purple-300 checked:bg-purple-600 checked:border-purple-600"
-                      />
-                      {loc}
-                    </label>
-                  ))}
+                        className={`
+                px-3 py-1.5 sm:px-5 sm:py-2 md:px-6 md:py-3
+                rounded-full 
+                text-sm sm:text-base md:text-lg 
+                font-medium font-poppins cursor-pointer transition
+                ${
+                  isSelected
+                    ? "border-2 sm:border-4 border-white"
+                    : "border border-blue-400 opacity-80 hover:opacity-100"
+                }
+                bg-white/10 backdrop-blur-sm
+                text-white
+              `}
+                      >
+                        {loc}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="flex justify-between pt-4">
-                <button className="text-sm text-blue-700 hover:underline" onClick={() => setStep(2)}>← Back</button>
-                <button onClick={search} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-md transition">
-                  <Search className="inline-block w-5 h-5 mr-2" />
+              {/* Buttons */}
+              <div className="flex justify-between mt-4 sm:mt-6 mb-10 sm:mb-12">
+                <button
+                  className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 
+                   rounded-lg sm:rounded-xl 
+                   text-sm sm:text-base md:text-lg 
+                   font-poppins text-white 
+                   border border-white/20 backdrop-blur-sm transition
+                   hover:border-blue-300"
+                  style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                  onClick={() => setStep(2)}
+                >
+                  Back
+                </button>
+
+                <button
+                  onClick={search}
+                  className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 
+                   rounded-lg sm:rounded-xl 
+                   text-sm sm:text-base md:text-lg 
+                   font-poppins font-semibold text-white 
+                   border border-white/20 backdrop-blur-sm transition
+                   hover:border-blue-300 flex items-center"
+                  style={{ backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                >
+                  <Search className="inline-block w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mr-1 sm:mr-2" />
                   Find Programs
                 </button>
               </div>
             </>
           )}
+
+          {loading && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
+              <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-400"></div>
+            </div>
+          )}
         </div>
       </div>
-
-      <Footer />
     </>
-  )
+  );
 }
 
-export default UniFinder
+export default UniFinder;
