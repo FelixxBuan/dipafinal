@@ -106,7 +106,7 @@ function ResultsSection({ results, message }) {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/school-strengths")
+    fetch(`${import.meta.env.VITE_API_URL}/api/school-strengths`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
@@ -163,7 +163,7 @@ function ResultsSection({ results, message }) {
     <div className="flex flex-col items-center mb-12 mt-12 text-center space-y-6 w-full px-4">
       {/* Title */}
 <h1
-  className="font-bold font-Poppins text-white text-center w-full"
+  className="font-bold font-poppins text-white text-center w-full"
   style={{
     fontSize: "clamp(1.5rem, 5vw, 3rem)",
     lineHeight: "clamp(2rem, 6vw, 3.5rem)",
