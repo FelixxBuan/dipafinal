@@ -16,8 +16,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-
-
 // Leaflet + React-Leaflet imports
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
@@ -31,15 +29,16 @@ const customMarker = new L.Icon({
   iconAnchor: [12, 41]
 });
 
+// Calculate distance between two lat/lng points
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   const R = 6371; // Earth radius in km
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLat / 2) ** 2 +
     Math.cos(lat1 * (Math.PI / 180)) *
       Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      Math.sin(dLon / 2) ** 2;
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
@@ -59,21 +58,28 @@ function LocationMarker({ setPinnedLocation }) {
 }
 
 function ResultsSection({ results, message }) {
+  const navigate = useNavigate();
+
+  // States
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [selectedSchools, setSelectedSchools] = useState([]);
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
   const [userCity, setUserCity] = useState(null);
   const [schoolStrengths, setSchoolStrengths] = useState({});
   const [pinnedLocation, setPinnedLocation] = useState(null);
-  const [showPinMap, setShowPinMap] = useState(false); // toggled per active card
-  const navigate = useNavigate();
-  
+  const [showPinMap, setShowPinMap] = useState(false);
 
-  // Reset the pin map toggle when switching expanded cards
-  useEffect(() => {
-    setShowPinMap(false);
-  }, [expandedIndex]);
+  // Sorting / filtering
+  const [sortOption, setSortOption] = useState("");
+  const [tuitionRange, setTuitionRange] = useState("");
+  const [schoolTypeFilter, setSchoolTypeFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
+  // Dynamic filter states
+const [activeFilter, setActiveFilter] = useState(""); // Main filter selected
+const [subOption, setSubOption] = useState(""); // Sub-option selected (High-Low, Tuition range, etc.)
 
+
+  // Get user geolocation
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -91,26 +97,18 @@ function ResultsSection({ results, message }) {
                 address.city || address.town || address.village || address.county;
               setUserCity(city || null);
             })
-            .catch((error) => console.error("Reverse geocoding error:", error));
+            .catch(console.error);
         },
-        (error) => {
-          console.error("Geolocation error:", error.message);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
+        (error) => console.error("Geolocation error:", error.message),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     }
   }, []);
 
+  // Fetch school strengths
   useEffect(() => {
     fetch("http://localhost:8000/api/school-strengths")
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => {
         const dataObject = {};
         (data.schools || []).forEach((school) => {
@@ -118,17 +116,17 @@ function ResultsSection({ results, message }) {
         });
         setSchoolStrengths(dataObject);
       })
-      .catch((error) => {
-        console.error("Error fetching school strengths:", error);
-        setSchoolStrengths({});
-      });
+      .catch(console.error);
   }, []);
 
+  // Reset pin map when switching expanded card
+  useEffect(() => setShowPinMap(false), [expandedIndex]);
+
+  // Handle compare checkbox
   const handleCheckboxChange = (item) => {
     const isAlreadySelected = selectedSchools.some(
       (school) => school.school === item.school && school.program === item.program
     );
-
     if (isAlreadySelected) {
       setSelectedSchools((prev) =>
         prev.filter(
@@ -140,165 +138,214 @@ function ResultsSection({ results, message }) {
     }
   };
 
-  if (!results || results.length === 0) {
-    return (
-      <div>
-        <Navbar />
-        <p className="text-center text-gray-500 mt-20">
-          {message || "No results found."}
-        </p>
-      </div>
+  // Determine displayed results based on only one active filter/subOption
+let displayedResults = results ? [...results] : [];
+
+if (activeFilter === "board" && subOption) {
+  if (subOption === "board_high") {
+    displayedResults.sort(
+      (a, b) => (parseFloat(b.board_passing_rate) || 0) - (parseFloat(a.board_passing_rate) || 0)
+    );
+  } else if (subOption === "board_low") {
+    displayedResults.sort(
+      (a, b) => (parseFloat(a.board_passing_rate) || 0) - (parseFloat(b.board_passing_rate) || 0)
     );
   }
+} else if (activeFilter === "tuition" && subOption) {
+  displayedResults = displayedResults.filter((item) => {
+    const tuition = parseFloat(item.tuition_per_semester) || 0;
+    if (subOption === "12000+") return tuition > 12000;
+    const [min, max] = subOption.split("-").map(Number);
+    return tuition >= min && tuition <= max;
+  });
+} else if (activeFilter === "school_type" && subOption) {
+  displayedResults = displayedResults.filter(
+    (item) => item.school_type?.toLowerCase() === subOption
+  );
+} else if (activeFilter === "location" && subOption) {
+  displayedResults = displayedResults.filter((item) => item.location === subOption);
+} else if (activeFilter === "unirank") {
+  displayedResults.sort((a, b) => (parseInt(a.unirank) || 999) - (parseInt(b.unirank) || 999));
+}
+
+
+  // Peso Icon
+  const PesoIcon = () => <span className="text-green-400 font-bold text-xl">₱</span>;
 
   return (
     <div className="font-Poppins">
-      {/* Navbar at the top */}
       <Navbar sticky={false} />
 
       <div className="pt-30 pb-4 px-4 w-full max-w-7xl mx-auto text-white">
+        {/* Title */}
+        <div className="flex flex-col items-center mb-12 mt-12 text-center space-y-6 w-full px-4">
+          <h1 className="font-bold text-white text-center w-full"
+              style={{ fontSize: "clamp(1.5rem, 5vw, 3rem)", lineHeight: "clamp(2rem, 6vw, 3.5rem)" }}>
+            Top Recommended Programs
+          </h1>
 
-<div>
-  {!message && (
-    <div className="flex flex-col items-center mb-12 mt-12 text-center space-y-6 w-full px-4">
-      {/* Title */}
-<h1
-  className="font-bold font-Poppins text-white text-center w-full"
-  style={{
-    fontSize: "clamp(1.5rem, 5vw, 3rem)",
-    lineHeight: "clamp(2rem, 6vw, 3.5rem)",
-  }}
->
-  Top 10 Recommended Programs
-</h1>
+          {/* Sorting & Filtering */}
+<div className="flex flex-wrap justify-center gap-3 mt-6 mb-12 text-white">
+  {/* Main Filter Selector */}
+  <select
+    value={activeFilter}
+    onChange={(e) => {
+      setActiveFilter(e.target.value);
+      setSubOption(""); // reset sub-option when main filter changes
+    }}
+    className="bg-white/10 border border-white/30 rounded-full px-4 py-2 backdrop-blur-md text-white"
+  >
+    <option value="">Select Filter / Sort</option>
+    <option value="board">Board Passing Rate</option>
+    <option value="tuition">Tuition Fee</option>
+    <option value="school_type">School Type</option>
+    <option value="location">Location</option>
+    <option value="unirank">UniRank</option>
+  </select>
 
+  {/* Sub-options appear conditionally based on activeFilter */}
+  {activeFilter === "board" && (
+    <select
+      value={subOption}
+      onChange={(e) => setSubOption(e.target.value)}
+      className="bg-white/10 border border-white/30 rounded-full px-4 py-2 backdrop-blur-md text-white"
+    >
+      <option value="">Select Board Rate</option>
+      <option value="board_high">High → Low</option>
+      <option value="board_low">Low → High</option>
+    </select>
+  )}
 
-      {/* Disclaimer */}
-      <div className="bg-yellow-500/20 backdrop-blur-md border border-yellow-400/40 rounded-xl px-8 py-4 max-w-4xl w-full text-center">
-        <p className="text-sm sm:text-base text-white/90">
-          ⚠️ Disclaimer: The results shown are recommendations based on your inputs and available school data. 
-          They are for reference only and should not replace official guidance from the institutions.
-        </p>
-      </div>
+  {activeFilter === "tuition" && (
+    <select
+      value={subOption}
+      onChange={(e) => setSubOption(e.target.value)}
+      className="bg-white/10 border border-white/30 rounded-full px-4 py-2 backdrop-blur-md text-white"
+    >
+      <option value="">Select Tuition Range</option>
+      <option value="0-3000">₱0 - ₱3,000</option>
+      <option value="3000-5000">₱3,000 - ₱5,000</option>
+      <option value="5000-8000">₱5,000 - ₱8,000</option>
+      <option value="8000-12000">₱8,000 - ₱12,000</option>
+      <option value="12000+">₱12,000+</option>
+    </select>
+  )}
+
+  {activeFilter === "school_type" && (
+    <select
+      value={subOption}
+      onChange={(e) => setSubOption(e.target.value)}
+      className="bg-white/10 border border-white/30 rounded-full px-4 py-2 backdrop-blur-md text-white"
+    >
+      <option value="">Select School Type</option>
+      <option value="public">Public</option>
+      <option value="private">Private</option>
+    </select>
+  )}
+
+  {activeFilter === "location" && (
+    <select
+      value={subOption}
+      onChange={(e) => setSubOption(e.target.value)}
+      className="bg-white/10 border border-white/30 rounded-full px-4 py-2 backdrop-blur-md text-white"
+    >
+      <option value="">Select Location</option>
+      <option value="Angeles">Angeles</option>
+      <option value="San Fernando">San Fernando</option>
+      <option value="Mabalacat">Mabalacat</option>
+      <option value="Other">Other</option>
+    </select>
+  )}
+
+  {activeFilter === "unirank" && (
+    <div className="text-white font-semibold px-4 py-2 bg-white/10 rounded-full">
+      Sorted by UniRank
     </div>
+  )}
+
+  {/* Optional Clear Button */}
+  {(activeFilter || subOption) && (
+    <button
+      onClick={() => {
+        setActiveFilter("");
+        setSubOption("");
+      }}
+      className="bg-red-600/50 hover:bg-red-600/70 text-white px-4 py-2 rounded-full"
+    >
+      Clear
+    </button>
   )}
 </div>
 
+        </div>
 
+        {/* Results */}
+        <div className="space-y-6">
+          {displayedResults.length === 0 && (
+            <p className="text-center text-gray-500 mt-20">
+              {message || "No results found."}
+            </p>
+          )}
 
-        {/* Main Results Section */}
-<div className="space-y-6">
-  {message && (
-    <div className="flex justify-center w-full mt-4 px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="flex items-center justify-center gap-3 bg-red-600/20 
-                   border border-red-500/40 text-white rounded-2xl 
-                   px-10 py-3 text-sm sm:text-base font-medium 
-                   shadow-md backdrop-blur-md text-center 
-                   w-full max-w-4xl"
-      >
-        <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-        <span className="text-white/90">{message}</span>
-      </motion.div>
-    </div>
-  )}
-
-
-
-
-          {results.map((item, index) => {
+          {displayedResults.map((item, index) => {
             const isExpanded = expandedIndex === index;
             const isSelected = selectedSchools.some(
               (school) => school.school === item.school && school.program === item.program
             );
-
             const schoolInfo = schoolStrengths[item.school] || {};
             const mapsQuery = schoolInfo.maps_query;
-
             const referenceLocation = pinnedLocation || userLocation;
-
             let distanceText = null;
-if (
-  referenceLocation.lat &&
-  referenceLocation.lng &&
-  schoolInfo?.coords?.lat &&
-  schoolInfo?.coords?.lng
-) {
-  const distance = getDistanceFromLatLonInKm(
-    referenceLocation.lat,
-    referenceLocation.lng,
-    schoolInfo.coords.lat,
-    schoolInfo.coords.lng
-  );
-
-  distanceText = `Approx. ${distance.toFixed(2)} km from your detected/pinned location to ${item.school}`;
-}
-
-const PesoIcon = () => (
-  <span className="text-green-400 font-bold text-xl">₱</span>
-)
-
-
+            if (referenceLocation.lat && referenceLocation.lng && schoolInfo.coords?.lat) {
+              const distance = getDistanceFromLatLonInKm(
+                referenceLocation.lat, referenceLocation.lng,
+                schoolInfo.coords.lat, schoolInfo.coords.lng
+              );
+              distanceText = `Approx. ${distance.toFixed(2)} km from your detected/pinned location to ${item.school}`;
+            }
+            const rank = index + 1;
+            const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : "";
+            const rankColor = "bg-[rgba(20,40,100,0.4)] backdrop-blur-lg border-[1.5px] border-[rgba(255,255,255,0.25)] shadow-lg";
 
             return (
-              <div
-  key={index}
-  className={`rounded-2xl bg-blue-800/20 backdrop-blur-md border border-white shadow-md 
-  transition-all duration-300 cursor-pointer hover:shadow-xl p-6
-  w-full sm:w-[95%] md:w-[90%] lg:w-[85%] mx-auto
-  ${isExpanded ? "bg-blue-800/40" : ""}`}
-  onClick={() => setExpandedIndex(isExpanded ? null : index)}
->
+              <div key={index}
+                className={`rounded-2xl ${rankColor} backdrop-blur-md border shadow-md transition-all duration-300 cursor-pointer hover:shadow-xl p-6 w-full sm:w-[95%] md:w-[90%] lg:w-[85%] mx-auto ${isExpanded ? "scale-[1.02]" : ""}`}
+                onClick={() => setExpandedIndex(isExpanded ? null : index)}
+              >
+                {/* Rank + Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2 text-white font-bold text-lg">
+                    <span className="text-2xl">{medal}</span>
+                    <span>{rank <= 3 ? ["1st","2nd","3rd"][rank-1] : `${rank}th`} Place</span>
+                  </div>
+                </div>
+
+                {/* Card Content */}
+                <div className="flex items-center gap-4 mb-3 w-full px-1 sm:px-3">
+                  {item.school_logo && (
+                    <div className="flex items-center justify-center rounded-full bg-white overflow-hidden w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 flex-shrink-0">
+                      <img src={item.school_logo} alt={`${item.school} logo`} className="object-contain w-full h-full" />
+                    </div>
+                  )}
+
+                  <div className="flex-1 min-w-0 text-left">
+                    <h2 className="font-semibold text-[13px] sm:text-base md:text-lg text-white line-clamp-3">{item.program}</h2>
+                    <p className="text-[12px] sm:text-sm md:text-base text-white opacity-90 line-clamp-2">{item.school}</p>
+                  </div>
+
+                  {/* Add / Compare Button */}
+                  <button
+                    className={`rounded-full font-medium transition !border !border-white/30 backdrop-blur-md !text-white shadow-md ${isSelected ? "!bg-red-600/40 hover:!bg-red-600/60" : "!bg-blue-600/30 hover:!bg-blue-600/50"} px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm md:px-4 md:py-2 md:text-sm`}
+                    onClick={(e) => { e.stopPropagation(); handleCheckboxChange(item); }}
+                  >
+                    <span className="block sm:hidden">{isSelected ? "−" : "+"}</span>
+                    <span className="hidden sm:block">{isSelected ? "Remove" : "Compare"}</span>
+                  </button>
+                </div>
 
 
-{/* Card Header */}
-<div className="flex items-center gap-4 mb-3 w-full px-1 sm:px-3">
-  {/* Logo */}
-  {item.school_logo && (
-    <div className="flex items-center justify-center rounded-full bg-white overflow-hidden
-                    w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 flex-shrink-0">
-      <img
-        src={item.school_logo}
-        alt={`${item.school} logo`}
-        className="object-contain w-full h-full"
-      />
-    </div>
-  )}
- 
-{/* Program + School */}
-<div className="flex-1 min-w-0 text-left">
-  <h2 className="font-semibold text-[13px] sm:text-base md:text-lg text-white line-clamp-3">
-    {item.program}
-  </h2>
-  <p className="text-[12px] sm:text-sm md:text-base text-white opacity-90 line-clamp-2">
-    {item.school}
-  </p>
-</div>
 
-
-  {/* Add/Remove Button */}
-<button
-  className={`rounded-full font-medium transition 
-    !border !border-white/30 backdrop-blur-md !text-white shadow-md
-    ${isSelected
-      ? "!bg-red-600/40 hover:!bg-red-600/60"
-      : "!bg-blue-600/30 hover:!bg-blue-600/50"}   // 👈 changed to blue shades
-    px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm md:px-4 md:py-2 md:text-sm
-  `}
-  onClick={(e) => {
-    e.stopPropagation();
-    handleCheckboxChange(item);
-  }}
->
-  <span className="block sm:hidden">{isSelected ? "−" : "+"}</span>
-  <span className="hidden sm:block">{isSelected ? "Remove" : "Compare"}</span>
-</button>
-
-
-</div>
+          
 
 
                 

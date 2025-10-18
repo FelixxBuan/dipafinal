@@ -89,15 +89,27 @@ function UniFinder() {
 
   const search = async () => {
   setLoading(true);
-  const payload = { answers, school_type: schoolType, locations }
-  if (schoolType === "private") payload.max_budget = maxBudget
+
+  const payload = { answers, school_type: schoolType, locations };
+  if (schoolType === "private") payload.max_budget = maxBudget;
+
+  const token = localStorage.getItem("token"); // ✅ get token saved from login
 
   try {
     const response = await fetch("http://127.0.0.1:8000/search", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }), // ✅ add Authorization header
+      },
       body: JSON.stringify(payload),
     });
+
+    if (response.status === 403) {
+      alert("You must be logged in to use this feature.");
+      setLoading(false);
+      return;
+    }
 
     const data = await response.json();
     localStorage.setItem("results", JSON.stringify(data.results || []));
@@ -111,6 +123,7 @@ function UniFinder() {
     setLoading(false);
   }
 };
+
 
 
 
@@ -186,7 +199,7 @@ const ProgressBar = () => {
     <div
   className="min-h-screen bg-cover bg-center bg-no-repeat px-4 text-white pt-16 sm:pt-20 lg:pt-36"
   style={{
-    backgroundImage: "url('/images/bg20.jpg')",
+    backgroundImage: "url('/images/6.jpg')",
   }}
 >
 
